@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>中考知识库 - 生物 & 地理</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts-wordcloud@2.1.0/dist/echarts-wordcloud.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root{
+--bg:#0f0f1a;--bg2:#1a1a2e;--bg3:#16213e;--bg4:#0f3460;
+--card-bg:linear-gradient(135deg,#1a1a2e,#16213e);
+--card-bg2:#1a1a2e;--card-bg3:#16213e;
+--text:#e0e0e0;--text2:#ddd;--text3:#ccc;--text4:#bbb;--text5:#888;--text6:#aaa;--text7:#999;--text8:#666;
+--border:#2a2a4a;--border2:#4a4a6a;--border3:#555;
+--header:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
+--modal-bg:rgba(0,0,0,.85);
+--scroll-track:#1a1a2e;--scroll-thumb:#4a4a6a;
+--sg:#4caf50;--so:#ff9800;--sr:#f44336;--sb:#2196f3;--sp:#9c27b0;--sc:#00bcd4;--sac:#e94560;
+--sg-bg:rgba(76,175,80,.2);--so-bg:rgba(255,152,0,.2);--sr-bg:rgba(244,67,54,.2);
+--sg-bg2:rgba(76,175,80,.06);--so-bg2:rgba(255,152,0,.08);--sb-bg2:rgba(33,150,243,.08);
+--exs-bg:rgba(33,150,243,.08);--qss-bg:rgba(255,152,0,.08);
+--lg1:linear-gradient(90deg,#4caf50,#66bb6a);
+--lg2:linear-gradient(90deg,#ff9800,#ffa726);
+--lg3:linear-gradient(90deg,#f44336,#ef5350);
+--tab-act:linear-gradient(135deg,#e94560,#533483);
+--shadow:rgba(0,0,0,.3);--btn-bg:#16213e;
+--sbtn-g:#4caf50;--sbtn-o:#ff9800;--sbtn-r:#f44336;
+--sbtn-t:white;
+}
+[data-theme="light"]{
+--bg:#f0f2f5;--bg2:#ffffff;--bg3:#f5f7fa;--bg4:#e8ecf1;
+--card-bg:linear-gradient(135deg,#fff,#f5f7fa);
+--card-bg2:#fff;--card-bg3:#f5f7fa;
+--text:#333;--text2:#444;--text3:#555;--text4:#666;--text5:#999;--text6:#888;--text7:#777;--text8:#aaa;
+--border:#e0e0e0;--border2:#ccc;--border3:#ddd;
+--header:linear-gradient(135deg,#667eea,#764ba2);
+--modal-bg:rgba(0,0,0,.5);
+--scroll-track:#e0e0e0;--scroll-thumb:#bbb;
+--sac:#e94560;
+--sg-bg:rgba(76,175,80,.15);--so-bg:rgba(255,152,0,.15);--sr-bg:rgba(244,67,54,.15);
+--sg-bg2:rgba(76,175,80,.05);--so-bg2:rgba(255,152,0,.08);--sb-bg2:rgba(33,150,243,.08);
+--exs-bg:rgba(33,150,243,.08);--qss-bg:rgba(255,152,0,.08);
+--tab-act:linear-gradient(135deg,#667eea,#764ba2);
+--shadow:rgba(0,0,0,.1);--btn-bg:#f0f2f5;
+--sbtn-g:#43a047;--sbtn-o:#ef6c00;--sbtn-r:#d32f2f;
+--sbtn-t:white;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei','PingFang SC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:17px;transition:background .3s,color .3s}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--scroll-track)}
+::-webkit-scrollbar-thumb{background:var(--scroll-thumb);border-radius:3px}
+.header{background:var(--header);padding:14px 24px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;transition:background .3s}
+.header-left h1{font-size:1.4em;color:#fff}
+.header-left .sub{color:rgba(255,255,255,.7);font-size:.78em;margin-top:2px}
+.theme-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;padding:8px 16px;cursor:pointer;font-size:.85em;transition:all .3s;display:flex;align-items:center;gap:6px}
+.theme-btn:hover{background:rgba(255,255,255,.25)}
+.container{max-width:1600px;margin:0 auto;padding:16px;transition:background .3s}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.sc{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;transition:transform .2s,background .3s,border .3s}
+.sc:hover{transform:translateY(-2px);box-shadow:0 6px 20px var(--shadow)}
+.sc .num{font-size:2em;font-weight:bold}
+.sc .num.gr{color:var(--sg)}.sc .num.or{color:var(--so)}.sc .num.re{color:var(--sr)}.sc .num.bl{color:var(--sb)}.sc .num.pu{color:var(--sp)}.sc .num.cy{color:var(--sc)}
+.sc .lb{color:var(--text5);font-size:.9em;margin-top:4px}
+.tabs{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;position:sticky;top:0;z-index:101;background:var(--bg);padding:12px 0;margin-top:-12px;padding-top:12px;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.tab{padding:12px 28px;border:1px solid var(--border);border-radius:10px;background:var(--card-bg2);color:var(--text5);cursor:pointer;font-size:1em;font-weight:bold;transition:all .3s;position:relative}
+.tab:hover{border-color:var(--border2);color:var(--text3)}
+.tab.act{background:var(--tab-act);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(102,126,234,.3)}
+.tab .bd{position:absolute;top:-5px;right:-5px;background:var(--so);color:#fff;font-size:.6em;padding:1px 6px;border-radius:8px}
+.tab.ds{opacity:.4;cursor:not-allowed}
+.pg{display:none}.pg.act{display:block}
+.sec{margin-bottom:28px}
+.st{font-size:1.3em;font-weight:bold;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px;transition:border .3s}
+.st .ac{color:var(--sac)}
+.cr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.cc{background:var(--card-bg2);border:1px solid var(--border);border-radius:10px;padding:12px;transition:background .3s,border .3s}
+.cc h4{color:var(--text6);font-size:.95em;margin-bottom:10px;text-align:center}
+.cb{width:100%;height:300px}
+.cbt{height:400px}
+.gp{background:var(--card-bg2);border:1px solid var(--border);border-radius:10px;padding:12px;height:480px;overflow:hidden;transition:background .3s,border .3s}
+.gp svg{width:100%;height:100%}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.tc{background:var(--card-bg2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;transition:all .3s;display:flex;gap:12px;align-items:flex-start}
+.tc:hover{transform:translateY(-2px);box-shadow:0 4px 12px var(--shadow);border-color:var(--border2)}
+.tc.sm{border-left-color:var(--sg)}.tc.ss{border-left-color:var(--so)}.tc.su{border-left-color:var(--sr)}
+.tc h5{color:var(--text2);font-size:1.05em;margin-bottom:6px}.tc .tl-time{color:var(--text5);font-size:.78em;min-width:44px;padding-top:6px;text-align:center;flex-shrink:0;font-weight:bold;font-variant-numeric:tabular-nums}.tl-body{flex:1;min-width:0}.tl-body h5{margin:0;font-size:.92em;color:var(--text3);font-weight:bold}.tl-body .tl-state{font-size:.82em;color:var(--text5);margin-top:2px}.tl-body .tl-state .tl-arr{color:var(--text5);margin:0 4px}
+.tc .stg{display:inline-block;padding:3px 12px;border-radius:12px;font-size:.8em;font-weight:bold;margin-top:8px}
+.tc .stg.m{background:var(--sg-bg);color:var(--sg)}
+.tc .stg.s{background:var(--so-bg);color:var(--so)}
+.tc .stg.u{background:var(--sr-bg);color:var(--sr)}
+.fb{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.fb label{color:var(--text5);font-size:.9em}
+.fb select,.fb input{padding:8px 16px;background:var(--btn-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9em;transition:background .3s,color .3s,border .3s}
+.fb select:focus{outline:none;border-color:var(--sac)}
+.lg{display:flex;gap:16px;margin:8px 0 12px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:.9em;color:var(--text6)}
+.ld{width:10px;height:10px;border-radius:50%}
+.prs{background:var(--card-bg2);border:1px solid var(--border);border-radius:12px;padding:20px;transition:background .3s,border .3s}
+.pbo{width:100%;height:20px;background:var(--bg3);border-radius:10px;overflow:hidden;margin-bottom:8px;display:flex}
+.psg{height:100%;transition:width .5s}
+.psg.m{background:var(--lg1)}.psg.s{background:var(--lg2)}.psg.u{background:var(--lg3)}
+.pc{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;transition:background .3s,border .3s}
+.pc .dy{color:var(--sac);font-weight:bold;font-size:1.1em}
+.pc .it{margin-top:10px}.pc .itm{padding:8px 0;border-bottom:1px solid var(--bg2);display:flex;justify-content:space-between;align-items:center}
+.pc .itm:last-child{border-bottom:none}
+.pc .itm .tn{color:var(--text3);font-size:.93em}
+.pc .itm .pr{padding:2px 10px;border-radius:8px;font-size:.75em}
+.pc .itm .pr.h{background:var(--sr-bg);color:var(--sr)}
+.pc .itm .pr.m{background:var(--so-bg);color:var(--so)}
+.pc .itm .pr.l{background:var(--sg-bg);color:var(--sg)}
+.mo{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--modal-bg);z-index:1000;overflow-y:auto}
+.mo.act{display:block}
+.mc{max-width:880px;margin:30px auto;background:var(--card-bg2);border:1px solid var(--border);border-radius:14px;padding:28px;transition:background .3s,border .3s}
+.mc h2{color:var(--sac);margin-bottom:16px;font-size:1.4em}
+.mc h3{color:var(--text2);margin:16px 0 8px;font-size:1.1em}
+.mc p,.mc li{color:var(--text4);line-height:1.8;font-size:1em}
+.mc ul,.mc ol{margin-left:20px;margin-bottom:12px}
+.mc .exs{background:var(--exs-bg);border-left:3px solid var(--sb);padding:12px 16px;border-radius:8px;margin:12px 0}
+.mc .qss{background:var(--qss-bg);border-left:3px solid var(--so);padding:12px 16px;border-radius:8px;margin:12px 0}
+.mc .sbs{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.mc .sbs button{padding:10px 24px;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:bold;transition:all .3s;color:var(--sbtn-t)}
+.mc .sbs button:hover{transform:scale(1.05)}
+.btn-g{background:var(--sbtn-g)}.btn-o{background:var(--sbtn-o)}.btn-r{background:var(--sbtn-r)}
+.mc-cl{position:fixed;top:16px;right:24px;font-size:2.5em;color:#fff;cursor:pointer;transition:transform .3s;z-index:1001;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.mc-cl:hover{transform:rotate(90deg);color:var(--sac)}
+.ib{padding:8px 20px;border:1px solid var(--border);border-radius:8px;background:var(--btn-bg);color:var(--text5);cursor:pointer;transition:all .3s;font-size:.9em}
+.ib:hover{background:var(--bg3);border-color:var(--border2);color:var(--text3)}
+.mk{background:var(--sr-bg2);border:1px solid var(--border);border-radius:10px;padding:14px 20px;margin-bottom:10px;color:var(--text4);font-size:1.15em;line-height:1.8;transition:background .3s,border .3s}
+.mk .ml{font-weight:bold;color:var(--sr)}
+.sk{background:var(--sg-bg2);border:1px solid var(--border);border-radius:10px;padding:14px 20px;margin-bottom:10px;color:var(--text4);font-size:1.15em;line-height:1.8;transition:background .3s,border .3s}
+.sk .sl{font-weight:bold;color:var(--sg)}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.gb{display:inline-block;padding:1px 10px;border-radius:10px;font-size:.75em;font-weight:bold;margin-left:6px}.g1{background:#4caf5022;color:#4caf50}.g2{background:#2196f322;color:#2196f3}.g3{background:#ff980022;color:#ff9800}.g0{background:#88888822;color:#888}
+.imgg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:8px}.imgg img{width:100%;height:160px;object-fit:cover;border-radius:8px;cursor:pointer;transition:transform .2s,box-shadow .2s;border:2px solid var(--border)}.imgg img:hover{transform:scale(1.03);box-shadow:0 4px 20px var(--shadow)}
+.lbo{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:2000;justify-content:center;align-items:center;flex-direction:column}.lbo.act{display:flex}.lbo .mol-c{max-width:820px;margin:0 auto;background:var(--card-bg2);border:1px solid var(--border);border-radius:14px;padding:28px;position:relative;width:90%;max-height:85vh;overflow-y:auto;z-index:2001}.lbo .lbc{position:relative;display:flex;align-items:center;justify-content:center;flex:1;width:100%;overflow:hidden}.lbo .lbc img{max-width:90%;max-height:85vh;border-radius:8px;transition:transform .3s;object-fit:contain;cursor:grab}.lbo .lbc img:active{cursor:grabbing}.lbo .lbh{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:linear-gradient(180deg,rgba(0,0,0,.7),transparent);z-index:10}.lbo .lbh .lbt{color:#fff;font-size:1em}.lbo .cbtn{position:fixed;top:16px;right:20px;font-size:2em;color:#fff;cursor:pointer;z-index:2100;transition:transform .3s;text-shadow:0 2px 8px rgba(0,0,0,.5);width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.15)}.lbo .cbtn:hover{transform:rotate(90deg);background:rgba(255,255,255,.25)}.lbo .nav{position:fixed;top:50%;transform:translateY(-50%);font-size:2.5em;color:#fff;cursor:pointer;z-index:2100;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.12);transition:background .3s;text-shadow:0 2px 8px rgba(0,0,0,.5);-webkit-user-select:none;user-select:none}.lbo .nav:hover{background:rgba(255,255,255,.25)}.lbo .nvp{left:16px}.lbo .nvn{right:16px}.lbo .zbar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:2100;background:rgba(255,255,255,.12);padding:8px 16px;border-radius:24px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}.lbo .zbar .zb{font-size:1.3em;color:#fff;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .3s;border:none;background:transparent}.lbo .zbar .zb:hover{background:rgba(255,255,255,.2)}.lbo .zbar .zl{color:rgba(255,255,255,.6);font-size:.85em;display:flex;align-items:center;min-width:36px;justify-content:center}
+.qs-item{background:var(--card-bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;transition:all .3s}.qs-item:hover{border-color:var(--sr)}.qs-item .qsq{font-size:1em;color:var(--text3);margin-bottom:8px;line-height:1.6}.qs-item .qsq .qst{color:var(--sr);font-weight:bold;cursor:pointer}.qs-item .qsq .qst:hover{opacity:.8}.qs-item .qsa{background:#4caf5015;border-radius:8px;padding:8px 12px;margin-top:6px;font-size:.92em;color:#4caf50;display:none}.qs-item .qsa.show{display:block}.qs-item .qsk{font-size:.78em;color:var(--text5);margin-top:4px}
+@media(max-width:900px){.cr{grid-template-columns:1fr}.stats{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}.mc{margin:16px 8px;padding:18px}.container{padding:8px}.dg{grid-template-columns:1fr}}
+
+/* ====== 语文深度学习页面（跟随主题） ====== */
+.dl{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:3000;overflow-y:auto}
+.dl.act{display:block}
+.dl-h{background:linear-gradient(135deg,#9c27b0,#533483);padding:20px 32px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.dl-h h2{color:#fff;font-size:1.5em;display:flex;align-items:center;gap:10px}
+.dl-h .sub{color:rgba(255,255,255,.6);font-size:.92em;margin-top:2px}
+.dl-cl{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1.8em;cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.dl-cl:hover{background:rgba(255,255,255,.3)}
+.dl-nav{display:flex;gap:4px;padding:14px 32px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;position:sticky;top:72px;z-index:9}
+.dl-nav .nt{background:transparent;border:1px solid var(--border2);border-radius:8px;padding:10px 22px;color:var(--text5);cursor:pointer;font-size:1em;transition:all .3s;font-weight:bold}
+.dl-nav .nt:hover{background:var(--bg3);color:var(--text3)}
+.dl-nav .nt.act{background:linear-gradient(135deg,#9c27b0,#533483);color:#fff;border-color:transparent}
+.dl-bd{padding:24px 32px;max-width:1200px;margin:0 auto}
+.dl-sec{margin-bottom:32px}
+.dl-sec .st2{font-size:1.35em;font-weight:bold;color:var(--text2);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
+.dl-sec .st2 .ic{color:#e94560}
+.dl-g{display:grid;gap:16px}
+.dl-g2{grid-template-columns:1fr 1fr}
+.dl-g3{grid-template-columns:1fr 1fr 1fr}
+.dl-g4{grid-template-columns:1fr 1fr 1fr 1fr}
+.dl-card{background:var(--card-bg2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .3s;cursor:pointer}
+.dl-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 4px 12px var(--shadow)}
+.dl-card .nm{color:#9c27b0;font-weight:bold;font-size:1.25em;margin-bottom:8px}
+.dl-card .ds{color:var(--text5);font-size:1em;line-height:1.7}
+.dl-card .stg2{display:inline-block;padding:4px 14px;border-radius:10px;font-size:.88em;font-weight:bold;margin-top:6px}
+.dl-card .stg2.m{background:var(--sg-bg);color:var(--sg)}
+.dl-card .stg2.s{background:var(--so-bg);color:var(--so)}
+.dl-card .stg2.u{background:var(--sr-bg);color:var(--sr)}
+.dl-card .cg{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dl-card .cg .ct{background:var(--bg3);border-radius:6px;padding:4px 12px;color:var(--text6);font-size:.92em;cursor:pointer;transition:all .2s}
+.dl-card .cg .ct:hover{background:var(--bg4);color:var(--text3)}
+.dl-card .kp{color:var(--sb);font-size:.95em;margin:8px 0 4px;font-weight:bold}
+.dl-tl{position:relative;padding:20px 0 20px 32px}
+.dl-tl::before{content:'';position:absolute;left:16px;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#9c27b0,#e94560);border-radius:2px}
+.dl-ti{display:flex;gap:16px;margin-bottom:20px;position:relative}
+.dl-ti .dt{min-width:60px;text-align:center;background:#9c27b022;border:1px solid #9c27b044;border-radius:8px;padding:8px 4px;color:#ce93d8;font-size:.8em;font-weight:bold}
+.dl-ti .dc{flex:1;background:var(--card-bg2);border:1px solid var(--border);border-radius:10px;padding:14px;transition:all .3s}
+.dl-ti .dc:hover{border-color:var(--border2)}
+.dl-ti .dc h4{color:var(--text2);font-size:.95em;margin-bottom:4px}
+.dl-ti .dc p{color:var(--text5);font-size:.82em;line-height:1.6}
+.dl-ti .dc .tag{display:inline-block;background:#9c27b022;color:#ce93d8;padding:1px 8px;border-radius:6px;font-size:.72em;margin-right:4px;margin-top:4px}
+.dl-ms{display:grid;gap:10px}
+.dl-ms .mi{background:var(--card-bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;transition:all .3s}
+.dl-ms .mi:hover{border-color:var(--border2)}
+.dl-ms .mi .ml2{color:var(--text3);font-size:.88em}
+.dl-ms .mi .mr{color:var(--text5);font-size:.78em}
+.dl-tbl{width:100%;border-collapse:collapse;font-size:.95em}
+.dl-tbl th{background:var(--bg3);color:var(--text6);padding:8px 12px;text-align:left;font-weight:normal;border-bottom:2px solid var(--border)}
+.dl-tbl td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text4)}
+.dl-tbl tr:hover td{background:var(--bg3)}
+.dl-tbl .tch{color:#e94560;font-weight:bold}
+.dl-pb{width:100%;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin:4px 0}
+.dl-pb .pf{height:100%;border-radius:4px;transition:width .8s}
+.dl-pb .pf.pg{background:linear-gradient(90deg,#4caf50,#66bb6a)}
+.dl-pb .pf.po{background:linear-gradient(90deg,#ff9800,#ffa726)}
+.dl-pb .pf.pp{background:linear-gradient(90deg,#9c27b0,#ce93d8)}
+.dl-pln{display:grid;gap:16px}
+.dl-pln .pl{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:18px 22px;display:flex;gap:18px;align-items:flex-start;transition:all .3s}
+.dl-pln .pl:hover{border-color:#9c27b066}
+.dl-pln .pl .pln{background:#9c27b0;color:#fff;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:1em;flex-shrink:0}
+.dl-pln .pl .pln.done{background:var(--sg)}
+.dl-pln .pl .pln.current{background:var(--so);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,152,0,.6)}70%{box-shadow:0 0 0 10px rgba(255,152,0,0)}100%{box-shadow:0 0 0 0 rgba(255,152,0,0)}}
+.dl-pln .pl .pld{flex:1}
+.dl-pln .pl .pld h4{color:var(--text2);font-size:1.1em;margin-bottom:4px}
+.dl-pln .pl .pld p{color:var(--text5);font-size:.95em}
+.dl-pln .pl .pld .tag2{display:inline-block;background:var(--bg3);padding:3px 12px;border-radius:10px;font-size:.85em;color:var(--text6);margin-top:4px}
+.dl-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.dl-stats .sc2{background:var(--card-bg2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;transition:all .3s}
+.dl-stats .sc2:hover{border-color:var(--border2);transform:translateY(-2px)}
+.dl-stats .sc2 .n2{font-size:1.8em;font-weight:bold}
+.dl-stats .sc2 .l2{color:var(--text5);font-size:.92em;margin-top:2px}
+/* 深度学习详情弹框 */
+.dl-mo{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--modal-bg);z-index:4000;overflow-y:auto}
+.dl-mo.act{display:block}
+.dl-mc{max-width:860px;margin:30px auto;background:var(--card-bg2);border:1px solid var(--border);border-radius:14px;padding:28px;position:relative;transition:background .3s,border .3s}
+.dl-mc .dm-cl{position:fixed;top:16px;right:24px;font-size:2.5em;color:#fff;cursor:pointer;transition:transform .3s;z-index:4001;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.dl-mc .dm-cl:hover{transform:rotate(90deg);color:var(--sac)}
+.dl-mc h2{color:var(--sac);margin-bottom:12px;font-size:1.6em}
+.dl-mc h3{color:var(--text2);margin:20px 0 10px;font-size:1.3em;padding-left:10px;border-left:3px solid #9c27b0}
+.dl-mc .dm-s{color:var(--text5);font-size:1em;margin-bottom:14px;line-height:1.8}
+.dl-mc .dm-b{background:var(--bg3);border-radius:10px;padding:16px 20px;margin:12px 0;line-height:2;color:var(--text4);font-size:1.05em}
+.dl-mc .dm-b .hl{color:var(--sac);font-weight:bold}
+.dl-mc .dm-q{background:var(--qss-bg);border-left:3px solid var(--so);padding:12px 16px;border-radius:8px;margin:10px 0;color:var(--text4)}
+.dl-mc .dm-q strong{color:var(--so)}
+.dl-mc .dm-t{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.dl-mc .dm-t .tg{background:#9c27b022;color:#ce93d8;padding:4px 14px;border-radius:12px;font-size:.92em}
+.dl-mc .qsa,.qss .qsa,.dm-q .qsa{display:none}.dl-mc .qsa.show,.qss .qsa.show,.dm-q .qsa.show{display:block!important}@media(max-width:900px){.dl-g2,.dl-g3,.dl-g4{grid-template-columns:1fr}.dl-nav{padding:10px 12px;top:64px}.dl-bd{padding:16px}.dl-h{padding:14px 16px}.dl-mc{margin:16px 8px;padding:18px}}
+
+
+/* ====== 生物/地理/实验深度学习（复用.dl体系，通过头部颜色区分） ====== */
+.dl-bio .dl-h{background:linear-gradient(135deg,#4caf50,#2e7d32)!important}
+.dl-geo .dl-h{background:linear-gradient(135deg,#2196f3,#0d47a1)!important}
+.dl-exp .dl-h{background:linear-gradient(135deg,#ff5722,#bf360c)!important}
+.dl-bio .dl-nav .nt.act,.dl-bio .dl-pln .pl .pln{background:linear-gradient(135deg,#4caf50,#2e7d32)!important}
+.dl-geo .dl-nav .nt.act,.dl-geo .dl-pln .pl .pln{background:linear-gradient(135deg,#2196f3,#0d47a1)!important}
+.dl-exp .dl-nav .nt.act,.dl-exp .dl-pln .pl .pln{background:linear-gradient(135deg,#ff5722,#bf360c)!important}
+.dl-bio .dl-tl::before{background:linear-gradient(180deg,#4caf50,#ff9800)!important}
+.dl-geo .dl-tl::before{background:linear-gradient(180deg,#2196f3,#ff9800)!important}
+.dl-exp .dl-tl::before{background:linear-gradient(180deg,#ff5722,#ff9800)!important}
+
+/* ====== 冲刺目标页面（增强版） ====== */
+.goal-sc{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:16px}
+.goal-sc .gsc{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;transition:all .3s}
+.goal-sc .gsc:hover{border-color:var(--border2);transform:translateY(-2px)}
+.goal-sc .gsc .gn1{font-size:1.5em;font-weight:bold}
+.goal-sc .gsc .gl1{font-size:.88em;color:var(--text5);margin-top:2px}
+.goal-sc .gsc .gup{font-size:.88em;font-weight:bold;margin-top:1px}
+.goal-tbl{width:100%;border-collapse:collapse;font-size:1em;margin-bottom:16px}
+.goal-tbl th{background:var(--bg3);color:var(--text6);padding:8px 10px;text-align:left;font-weight:normal;border-bottom:2px solid var(--border)}
+.goal-tbl td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text4)}
+.goal-tbl tr:hover td{background:var(--bg3)}
+.goal-tbl .tch{color:var(--sac);font-weight:bold}
+.goal-tbl .gp{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.goal-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin:2px 0;min-width:60px}
+.goal-bar .bf{height:100%;border-radius:4px;transition:width .8s}
+.goal-bar .bf.gn{background:linear-gradient(90deg,#4caf50,#66bb6a)}
+.goal-bar .bf.or{background:linear-gradient(90deg,#ff9800,#ffa726)}
+.goal-bar .bf.rd{background:linear-gradient(90deg,#f44336,#ef5350)}
+.goal-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.goal-card h4{color:var(--sac);font-size:1.15em;margin-bottom:8px}
+.goal-card p{color:var(--text5);font-size:1em;line-height:1.8}
+.goal-card .gcb{height:260px;width:100%}
+.goal-tip{background:var(--qss-bg);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:1em;color:var(--text4);line-height:1.8;margin-bottom:12px}
+/* 强制覆盖内联字号——所有卡片描述提升到可读大小 */
+.dl-card .ds{font-size:1em!important}
+.dl-card .nm{font-size:1.25em!important}
+.pd-items .pi .pi-c .pi-t{font-size:1em!important}
+.pd-items .pi .pi-c .pi-d{font-size:.9em!important}
+.goal-tbl td{font-size:.95em!important}
+.goal-tbl th{font-size:.95em!important}
+.dl-mc .dm-q{font-size:1em!important;padding:14px 18px!important}
+/* 精力分配 */
+.erg-sc{display:grid;gap:10px}
+.erg-sc .er{display:flex;align-items:center;gap:10px}
+.erg-sc .er .ed{min-width:60px;font-size:1em;font-weight:bold;color:var(--text3)}
+.erg-sc .er .eb{flex:1;height:22px;background:var(--bg3);border-radius:11px;overflow:hidden;position:relative}
+.erg-sc .er .eb{flex:1;height:28px;background:var(--bg3);border-radius:14px;overflow:hidden;position:relative}.erg-sc .er .eb .ef{height:100%;border-radius:14px;transition:width 1s;display:flex;align-items:center;justify-content:center;font-size:.82em;color:#fff;font-weight:bold;min-width:36px}
+.erg-sc .er .ep{min-width:40px;font-size:.95em;color:var(--text5);text-align:right}
+/* 动态每日计划 */
+.plan-nav{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.plan-nav .pn{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 18px;color:var(--text5);cursor:pointer;font-size:.95em;transition:all .3s;font-weight:bold}
+.plan-nav .pn:hover{background:var(--bg3);color:var(--text3)}
+.plan-nav .pn.act{background:linear-gradient(135deg,#e94560,#533483);color:#fff;border-color:transparent}
+.plan-day{display:none}
+.plan-day.act{display:block}
+.plan-day .pd-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.plan-day .pd-h .pd-t{font-size:1.3em;font-weight:bold;color:var(--text2)}
+.plan-day .pd-h .pd-tg{padding:4px 14px;border-radius:10px;font-size:.88em;font-weight:bold;color:#fff}
+.pd-items{display:grid;gap:8px}
+.pd-items .pi{display:flex;gap:10px;background:var(--card-bg2);border:1px solid var(--border);border-radius:10px;padding:12px;align-items:flex-start;transition:all .3s;cursor:default}
+.pd-items .pi:hover{border-color:var(--border2)}
+.pd-items .pi .pi-n{background:var(--bg3);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:.9em;font-weight:bold;color:var(--text4);flex-shrink:0}
+.pd-items .pi .pi-c{flex:1}
+.pd-items .pi .pi-c .pi-t{font-size:1em;color:var(--text3);font-weight:bold}
+.pd-items .pi .pi-c .pi-d{font-size:.9em;color:var(--text5);margin-top:4px;line-height:1.6}
+.pd-items .pi .pi-st{font-size:.85em;padding:4px 12px;border-radius:8px;flex-shrink:0;align-self:center}
+.pi-st.ul{background:var(--sr-bg);color:var(--sr)}
+.pi-st.sl{background:var(--so-bg);color:var(--so)}
+.pi-st.ml{background:var(--sg-bg);color:var(--sg)}
+.plan-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px}
+.plan-summary .ps{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center}
+.plan-summary .ps .ps-n{font-size:1.3em;font-weight:bold}
+.plan-summary .ps .ps-l{font-size:.88em;color:var(--text5);margin-top:1px}
+.effort-chart{display:grid;grid-template-columns:1fr 1.3fr;gap:16px}
+@media(max-width:900px){.effort-chart{grid-template-columns:1fr}}
+
+/* ====== 弹框左右箭头导航 ====== */
+.dl-nav-btn,.mo-nav-btn{position:fixed;top:50%;transform:translateY(-50%);cursor:pointer;transition:all .3s;width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);text-shadow:0 2px 6px rgba(0,0,0,.5);-webkit-user-select:none;user-select:none;color:#fff}
+.dl-nav-btn{z-index:4002;font-size:2.8em}.dl-nav-btn:hover{background:rgba(255,255,255,.28);transform:translateY(-50%) scale(1.1)}
+.mo-nav-btn{z-index:1002;font-size:2.5em}.mo-nav-btn:hover{background:rgba(255,255,255,.28);transform:translateY(-50%) scale(1.1)}
+.dlnb-prev,.mo-np{left:10px}.dlnb-next,.mo-nn{right:10px}
+.dl-nav-btn .dnb-hide,.mo-nav-btn .mnb-hide{display:none!important}
+
+.tb-ctl{display:inline-flex;align-items:center;gap:2px;margin-left:10px;background:var(--card-bg2);border:1px solid var(--border);border-radius:8px;padding:3px 8px;transition:background .3s,border .3s}
+.tb-ctl button{background:none;border:none;color:var(--text2);cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .2s;font-weight:bold;line-height:1;font-size:.95em}
+.tb-ctl button:hover{background:var(--bg3)}
+.tb-ctl .tb-fv{font-size:.85em;color:var(--text5);min-width:24px;text-align:center;font-weight:bold}
+.tb-ctl .tb-dv{color:var(--border);font-size:.9em;padding:0 2px}
+.dropdown{position:relative;display:inline-block}
+.dropdown-menu{display:none;position:absolute;top:100%;right:0;background:var(--card-bg2);border:1px solid var(--border);border-radius:8px;min-width:160px;z-index:1000;margin-top:4px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.dropdown-menu.show{display:block}
+.dropdown-menu a{display:block;padding:10px 16px;color:var(--text4);cursor:pointer;font-size:.9em;transition:all .2s;border-bottom:1px solid var(--border)}
+.dropdown-menu a:last-child{border-bottom:none}
+.dropdown-menu a:hover{background:var(--bg3);color:var(--text2)}
+
+/* ====== AI 助手 ====== */
+.ai-fab{position:fixed;bottom:28px;right:28px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#4a90d9,#357abd);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;z-index:9999;box-shadow:0 4px 16px rgba(74,144,217,.5);transition:all .3s;border:none;outline:none}
+.ai-fab:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(74,144,217,.6)}
+.ai-panel{position:fixed;bottom:96px;right:28px;width:380px;height:460px;background:var(--card-bg);border:1px solid var(--border);border-radius:16px;z-index:9998;display:none;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.25);overflow:hidden;transition:none;min-width:280px;min-height:300px;max-width:90vw;max-height:90vh;resize:both}.ai-panel.act{display:flex}.ai-panel.ai-min{width:380px!important;height:52px!important;min-height:0!important;resize:none!important;overflow:hidden!important}.ai-panel.ai-min .ai-log,.ai-panel.ai-min .ai-inp-bar,.ai-panel.ai-min .ai-ph .ai-ps,.ai-panel.ai-min .ai-ph .ai-pb{display:none!important}
+.ai-ph{cursor:grab;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg2);-webkit-user-select:none;user-select:none;flex-shrink:0}
+.ai-ph:active{cursor:grabbing}
+.ai-ph .ai-pt{font-weight:bold;font-size:1em;color:var(--text2)}
+.ai-ph .ai-ps{font-size:.8em;color:var(--text5)}
+.ai-ph .ai-pb{background:none;border:none;color:var(--text5);cursor:pointer;font-size:1.1em;padding:4px;border-radius:6px;transition:all .2s;line-height:1}
+.ai-ph .ai-pb:hover{background:var(--bg3);color:var(--text2)}
+.ai-ph .ai-actions{display:flex;gap:2px}
+.ai-log{flex:1;overflow-y:auto;padding:12px;min-height:200px}
+.ai-msg{padding:8px 12px;margin-bottom:6px;border-radius:10px;font-size:.9em;line-height:1.5;word-break:break-word}
+.ai-user{background:var(--bg3);color:var(--text3);margin-left:20px}
+.ai-bot{background:var(--bg2);color:var(--text4);margin-right:20px;border:1px solid var(--border)}
+.ai-err{background:var(--sr-bg);color:var(--sr);margin-right:20px;font-size:.85em}
+.ai-inp-bar{display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0}
+.ai-inp-bar input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text2);font-size:.9em;outline:none}
+.ai-inp-bar input:focus{border-color:var(--sac)}
+.ai-inp-bar button{padding:8px 14px;border:none;border-radius:8px;background:var(--sac);color:#fff;cursor:pointer;font-weight:bold;font-size:.9em}
+.ai-inp-bar button:hover{opacity:.85}
+.ai-pp{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:99999;align-items:center;justify-content:center}
+.ai-pp.act{display:flex}
+.ai-pp-box{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;width:400px;max-height:80vh;overflow-y:auto;padding:24px;box-shadow:0 16px 48px rgba(0,0,0,.35)}
+.ai-pp-box h3{margin:0 0 16px;color:var(--text2);font-size:1.2em;display:flex;align-items:center;gap:8px}
+.ai-pp-box .ppf{margin-bottom:14px}
+.ai-pp-box .ppf label{display:block;font-size:.85em;color:var(--text5);margin-bottom:4px;font-weight:bold}
+.ai-pp-box .ppf input,.ai-pp-box .ppf select{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);color:var(--text2);font-size:.95em;box-sizing:border-box;outline:none}
+.ai-pp-box .ppf input:focus,.ai-pp-box .ppf select:focus{border-color:var(--sac)}
+.ai-pp-box .ppf .pp-h{font-size:.78em;color:var(--text5);margin-top:3px}
+.ai-pp-box .pp-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.ai-pp-box .pp-btns button{padding:8px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:.9em}
+.ai-pp-box .pp-btns .pp-save{background:var(--sac);color:#fff}
+.ai-pp-box .pp-btns .pp-save:hover{opacity:.85}
+.ai-pp-box .pp-btns .pp-cancel{background:var(--bg3);color:var(--text5)}
+.ai-pp-box .pp-btns .pp-cancel:hover{background:var(--bg4)}
+.ai-dm-box{max-width:500px}.ai-dm-box .dm-sec{border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}.ai-dm-box .dm-sec h4{margin:0 0 8px;font-size:.95em;color:var(--text2)}.ai-dm-box .dm-sec p{font-size:.82em;color:var(--text5);margin:0 0 10px;line-height:1.5}.ai-dm-box .dm-sec .dm-btns{display:flex;gap:8px;flex-wrap:wrap}.ai-dm-box .dm-sec .dm-btns button{padding:7px 16px;border:none;border-radius:8px;cursor:pointer;font-size:.82em;font-weight:bold;transition:opacity .2s}.ai-dm-box .dm-sec .dm-btns button:hover{opacity:.8}.dm-btn-p{background:var(--sac);color:#fff}.dm-btn-d{background:var(--sr);color:#fff}.dm-btn-s{background:var(--so);color:#fff}.dm-btn-n{background:var(--bg3);color:var(--text5)}.dm-backup-list{font-size:.8em;color:var(--text5);margin-top:8px;max-height:120px;overflow-y:auto}.dm-backup-list>div{padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+@media(max-width:480px){.ai-panel{width:calc(100vw-40px);right:20px;bottom:84px}.ai-pp-box{width:calc(100vw-40px)}}
+#st-f{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+#st-f .tf{padding:6px 16px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text5);cursor:pointer;font-size:.85em;transition:all .2s;font-weight:bold}
+#st-f .tf:hover{background:var(--bg3);color:var(--text3)}
+#st-f .tf.act{background:var(--sac);color:#fff;border-color:transparent}</style></head><body>
+<div class="header">
+<div><h1>中考知识库大数据系统</h1><div class="sub">山西中考 · 知识点全景仪表盘 · 学习计划自动生成</div></div>
+<div style="display:flex;align-items:center;gap:10px">
+<button class="ib" onclick="policy_open()">📋 定向生政策</button>
+<div class="dropdown"><button class="ib" onclick="toggleDropdown(event)">📊 分数线参考 ▼</button>
+<div class="dropdown-menu" id="scoreDropdown"><a onclick="scoreData_open('二模')">2026届 · 二模数据</a><a onclick="scoreData_open('一模')">2026届 · 一模数据</a></div></div>
+<div class="tb-ctl"><button onclick="fsz(-1)" title="缩小文字">A−</button>
+<span class="tb-fv" id="fszV">16</span>
+<button onclick="fsz(1)" title="放大文字">A+</button>
+<span class="tb-dv">|</span>
+<button onclick="toggleTheme()" id="themeBtn">🌙 深色</button>
+</div>
+</div>
+</div>
+<div class="container" id="container"><div class="stats" id="gstats"></div><div class="tabs" id="stabs"></div><div id="sarea"></div></div>
+
+<button class="ai-fab" onclick="ai_toggle()" title="AI 学习助手">🤖</button>
+<div class="ai-panel" id="ai-panel">
+<div class="ai-ph" id="ai-ph"><span class="ai-pt">🤖 AI 学习助手</span><span class="ai-ps">基于Deepseek</span><div class="ai-actions"><button class="ai-pb" onclick="ai_profile()" title="学习档案">👤</button><button class="ai-pb" onclick="data_mgmt_open()" title="数据管理">💾</button><button class="ai-pb" onclick="ai_clear_log()" title="清除记录">🗑️</button><button class="ai-pb" onclick="ai_set_key()" title="设置API Key">🔑</button><button class="ai-pb" onclick="ai_minimize()" title="最小化">─</button><button class="ai-pb" onclick="ai_toggle()">✕</button></div></div>
+<div class="ai-log" id="ai-log"><div class="ai-msg ai-bot">🤖 您好，我是中考学习助手！告诉我您想了解哪方面的学习建议？</div></div>
+<div class="ai-inp-bar"><input id="ai-inp" placeholder="输入问题，按回车发送..." onkeydown="if(event.key==='Enter')ai_send()"><button onclick="ai_send()">发送</button></div>
+</div>
+<div class="ai-pp" id="ai-pp"><div class="ai-pp-box"><h3>👤 学习档案</h3>
+<div class=ppf><label>姓名或昵称</label><input id=pp-name placeholder="如：小明" maxlength=20></div>
+<div class=ppf><label>年级</label><select id=pp-grade><option value=0>请选择</option><option value=7>初一</option><option value=8>初二</option><option value=9>初三</option></select></div>
+<div class=ppf><label>目标高中</label><input id=pp-target placeholder="如：山大附中" maxlength=30></div>
+<div class=ppf><label>当前优势科目</label><input id=pp-strong placeholder="如：数学、英语" maxlength=50></div>
+<div class=ppf><label>薄弱科目</label><input id=pp-weak placeholder="如：物理、化学" maxlength=50></div>
+<div class=ppf><label>学习备注（选填）</label><input id=pp-note placeholder="如：每天晚自习2小时" maxlength=100><div class=pp-h>每次对话会自动读取，帮助 AI 给出针对性建议</div></div>
+<div class=pp-btns><button class=pp-cancel onclick="ai_profile_close()">取消</button><button class=pp-save onclick="ai_profile_save()">💾 保存档案</button></div>
+</div></div>
+<div class="ai-pp" id="ai-dm"><div class="ai-pp-box ai-dm-box"><h3>💾 数据管理</h3>
+<div class=dm-sec><h4>📤 导出数据</h4><p>将所有学习记录、掌握状态、操作痕迹导出为 JSON 文件，便于本地备份。</p><div class=dm-btns><button class=dm-btn-p onclick="data_export()">📥 导出全部数据</button></div></div>
+<div class=dm-sec><h4>📥 导入恢复</h4><p>从之前导出的 JSON 文件恢复数据。注意：导入将覆盖当前所有学习记录。</p><div class=dm-btns><button class=dm-btn-s onclick="document.getElementById('dm-file').click()">📂 选择文件恢复</button><input type=file id=dm-file accept=.json style=display:none onchange="data_import(this)"></div></div>
+<div class=dm-sec><h4>🔄 自动备份</h4><p>每次重要操作时自动保存快照，最多保留 5 份。如数据意外丢失可回滚。</p><div class=dm-btns><button class=dm-btn-n onclick="data_backup()">💾 立即备份</button><button class=dm-btn-d onclick="data_backups_show()">📋 查看备份</button><button class=dm-btn-n onclick="data_backup_auto_toggle()" id="dm-auto-btn">⏸ 暂停自动备份</button></div><div class=dm-backup-list id="dm-backup-list"></div></div>
+<div class=pp-btns style=margin-top:0><button class=pp-cancel onclick="data_mgmt_close()">关闭</button></div>
+</div></div>
+<div class="mo" id="mol"><div class="mc-cl" onclick="cm()">&times;</div><span class="mo-nav-btn mo-np" onclick="_dlNavPrev()">&#10094;</span><div class="mc" id="mct"></div><span class="mo-nav-btn mo-nn" onclick="_dlNavNext()">&#10095;</span></div>
+
+<!-- 定向生政策弹框 -->
+<div class="mo" id="policy-mo"><div class="mc-cl" onclick="policy_close()">&times;</div><div class="mc" id="policy-content"></div></div>
+
+<!-- 分数线参考弹框 -->
+<div class="mo" id="score-mo"><div class="mc-cl" onclick="scoreData_close()">&times;</div><div class="mc" id="score-content"></div></div>
+
+<!-- ====== 深度学习详情弹框 ====== -->
+<div class="dl-mo" id="dlmo"><div class="dm-cl" onclick="cdmc()">&times;</div><span class="dl-nav-btn dlnb-prev" onclick="_dlNavPrev()">&#10094;</span><div class="dl-mc" id="dlmc"></div><span class="dl-nav-btn dlnb-next" onclick="_dlNavNext()">&#10095;</span></div>
+
+<!-- ====== 深度学习详情弹框 ====== -->
+<div class="dl-mo" id="dlmo"><div class="dm-cl" onclick="cdmc()">&times;</div><span class="dl-nav-btn dlnb-prev" onclick="_dlNavPrev()">&#10094;</span><div class="dl-mc" id="dlmc"></div><span class="dl-nav-btn dlnb-next" onclick="_dlNavNext()">&#10095;</span></div>
+<div class="lbo" id="lbo"><div class="cbtn" onclick="clb()">&times;</div><div class="nav nvp" onclick="plb(-1)">&#8249;</div><div class="nav nvn" onclick="plb(1)">&#8250;</div><div class="lbh"><span class="lbt" id="lbt"></span></div><div class="lbc" id="lbc"><img id="lbi" src="" alt=""></div><div class="zbar"><button class="zb" onclick="zlb(-.25)">&#8722;</button><span class="zl" id="lbl">100%</span><button class="zb" onclick="zlb(0)">&#8634;</button><button class="zb" onclick="zlb(.25)">&#43;</button></div></div>
+
+<script>
+// ====== THEME ======
+function toggleTheme(){
+const h=document.documentElement;const now=h.getAttribute('data-theme');const next=now==='dark'?'light':'dark';
+h.setAttribute('data-theme',next);localStorage.setItem('km_theme',next);
+document.getElementById('themeBtn').innerHTML=next==='dark'?'🌙 深色':'☀️ 浅色';
+document.querySelectorAll('.mo .mc').forEach(el=>{el.style.background=''})}
+function initTheme(){
+initFsz();
+const saved=localStorage.getItem('km_theme')||'dark';
+document.documentElement.setAttribute('data-theme',saved);
+document.getElementById('themeBtn').innerHTML=saved==='dark'?'🌙 深色':'☀️ 浅色';}
+</script>
+<!-- ====== DATA ====== -->
+<script src="data.js"></script>
+<script>
+
+function loadS(){try{const o=JSON.parse(localStorage.getItem(SK)||'{}');Object.keys(S).forEach(k=>{S[k].tp.forEach(t=>{if(o[k+'_'+t.id])t.st=o[k+'_'+t.id]})})}catch(e){}}
+function saveS(){const o={};Object.keys(S).forEach(k=>{S[k].tp.forEach(t=>{o[k+'_'+t.id]=t.st})});localStorage.setItem(SK,JSON.stringify(o));data_backup_auto()}
+function gs(){let tt=0,m=0,s=0,u=0,tp=0;Object.keys(S).forEach(k=>{S[k].tp.forEach(t=>{tt++;t.st==='mastered'?m++:t.st==='studying'?s++:u++;tp+=t.kp.length})});return{tt,m,s,u,tp}}
+function rgs(){const g=gs();const p=g.tt>0?Math.round(g.m/g.tt*100):0;
+document.getElementById('gstats').innerHTML=
+`<div class=sc><div class="num cy">${Object.keys(S).length}</div><div class=lb>科目数</div></div>
+<div class=sc><div class="num bl">${g.tt}</div><div class=lb>总专题数</div></div>
+<div class=sc><div class="num bl">${g.tp}</div><div class=lb>总知识点数</div></div>
+<div class=sc><div class="num gr">${g.m}</div><div class=lb>已掌握</div></div>
+<div class=sc><div class="num or">${g.s}</div><div class=lb>学习中</div></div>
+<div class=sc><div class="num re">${g.u}</div><div class=lb>未掌握</div></div>
+<div class=sc><div class="num gr" style=font-size:1.4em>${p}%</div><div class=lb>总掌握率</div></div>`}
+function rst(){const c=document.getElementById('stabs');
+c.innerHTML=Object.keys(S).map(function(k){const s=S[k];const a=k===cur;const uc=s.tp.filter(function(t){return t.st==='unlearned'}).length;return'<div class="tab'+(a?' act':'')+'" onclick="sw(\x27'+k+'\x27)">'+s.i+s.n+(uc?'<span class=bd>'+uc+'</span>':'')+'</div>'}).join('')+'<div class="tab'+(cur==='_goal'?' act':'')+'" onclick="sw(\x27_goal\x27)">\ud83c\udf1f \u51b2\u523a\u76ee\u6807</div><div class="tab'+(cur==='_stats'?' act':'')+'" onclick="sw(\x27_stats\x27)">\ud83d\udcca \u5b66\u4e60\u7edf\u8ba1</div>'}
+function sw(k){cur=k;document.querySelectorAll('.tab').forEach(function(e,i){e.classList.toggle('act',i===Object.keys(S).indexOf(k)||(k==='_goal'&&i===Object.keys(S).length)||(k==='_stats'&&i===Object.keys(S).length+1))});if(k==='_goal'){rgoal()}else if(k==='_stats'){rstats()}else{rsc()}}function rsc(){const c=document.getElementById('sarea');
+c.innerHTML=Object.keys(S).map(k=>`<div class="pg${k===cur?' act':''}" id=c-${k}></div>`).join('');rsd(cur)}
+function rsd(k){const s=S[k];const c=document.getElementById('c-'+k);const tt=s.tp.length;const m=s.tp.filter(t=>t.st==='mastered').length;
+const su=s.tp.filter(t=>t.st==='studying').length;const u=s.tp.filter(t=>t.st==='unlearned').length;const tp=s.tp.reduce((a,t)=>a+t.kp.length,0);
+const dbt={chi:'cld',bio:'bld',geo:'gld',math:'mald',phy:'phdl',eng:'endl',his:'hidl',pol:'poldl',exp:'expld'};const dbn={chi:'📚 语文',bio:'🧬 生物',geo:'🌍 地理',math:'🔢 数学',phy:'⚡ 物理',eng:'🔤 英语',his:'📜 历史',pol:'⚖️ 道法',exp:'🔬 生物实验'};const dbc={chi:'#9c27b0',bio:'#4caf50',geo:'#2196f3',math:'#ff9800',phy:'#f44336',eng:'#00bcd4',his:'#607d8b',pol:'#e91e63',exp:'#ff5722'};const deepBtn=dbt[k]?'<button class=ib style=background:'+dbc[k]+';color:#fff;border-color:'+dbc[k]+';margin-left:12px;padding:8px 24px;font-size:.95em;font-weight:bold onclick="'+dbt[k]+'()">'+dbn[k]+'深度学习 →</button>':'';const imgSec=k==='geo'?"<div class=sec><div class=st><span class=ac>🖼️</span>地理知识图汇总</div><div class=imgg id=img-geo></div></div>":k==='bio'?"<div class=sec><div class=st><span class=ac>🖼️</span>生物实验图汇总</div><div class=imgg id=img-bio></div></div>":k==='chi'?"<div class=sec><div class=st><span class=ac>🖼️</span>语文知识图汇总</div><div class=imgg id=img-chi></div></div>":k==='eng'?"<div class=sec><div class=st><span class=ac>🖼️</span>英语知识图汇总</div><div class=imgg id=img-eng></div></div>":k==='math'?"<div class=sec><div class=st><span class=ac>🖼️</span>数学知识图汇总</div><div class=imgg id=img-math></div></div>":k==='phy'?"<div class=sec><div class=st><span class=ac>🖼️</span>物理知识图汇总</div><div class=imgg id=img-phy></div></div>":'';
+c.innerHTML=`<div class=stats style=grid-template-columns:repeat(auto-fit,minmax(120px,1fr))>
+<div class=sc><div class="num bl">${tt}</div><div class=lb>专题数</div></div>
+<div class=sc><div class="num cy">${tp}</div><div class=lb>知识点数</div></div>
+<div class=sc><div class="num gr">${tt>0?Math.round(m/tt*100):0}%</div><div class=lb>掌握率</div></div>
+<div class=sc><div class="num gr">${m}</div><div class=lb>已掌握</div></div>
+<div class=sc><div class="num or">${su}</div><div class=lb>学习中</div></div>
+<div class=sc><div class="num re">${u}</div><div class=lb>待攻克</div></div></div>
+<div class=sec><div class=st><span class=ac>📊</span>数据总览</div>
+<div class=cr><div class=cc><h4>考点频率分布</h4><div class=cb id=pie-${k}></div></div>
+<div class=cc><h4>高频考点词云</h4><div class=cb id=cloud-${k}></div></div>
+<div class=cc><h4>掌握度分布</h4><div class=cb id=spie-${k}></div></div></div></div>
+<div class=sec><div class=st><span class=ac>🔗</span>知识点关系图谱</div><div class=gp id=graph-${k}></div></div>
+${imgSec}
+<div class=sec><div class=st><span class=ac>📖</span>专题列表<span style=font-size:.7em;color:var(--text5);font-weight:400;margin-left:8px>点击查看详情</span>${deepBtn}</div>
+<div class=fb><label>状态：</label><select id=f-${k} onchange="rtl('${k}')"><option value=all>全部</option><option value=unlearned>未掌握</option><option value=studying>学习中</option><option value=mastered>已掌握</option></select>
+<label style=margin-left:12px>年级：</label><select id=fg-${k} onchange="rtl('${k}')"><option value=all>全部</option><option value=0>全年级</option><option value=1>初一</option><option value=2>初二</option><option value=3>初三</option></select>
+<button class=ib onclick="gsp('${k}')">📋 生成学习计划</button></div>
+<div class=lg><div class=li><div class=ld style=background:#f44336></div>未掌握</div><div class=li><div class=ld style=background:#ff9800></div>学习中</div><div class=li><div class=ld style=background:#4caf50></div>已掌握</div></div>
+<div class=tg id=t-${k}></div></div>
+<div class=sec><div class=st><span class=ac>📈</span>学习进度</div><div class=prs id=pro-${k}></div></div>
+<div class=sec id=plan-${k}></div>
+<div class=dg><div><div class=st><span class=ac>⚠️</span>高频易错点</div><div id=mk-${k}></div></div><div><div class=st><span class=ac>💡</span>解题技巧</div><div id=sk-${k}></div></div></div>`;
+rtl(k);rp(k);rmk(k);rsk(k);setTimeout(()=>{ipc(k);iwc(k);ispc(k);ikg(k);if(k==='geo')rig(k);if(k==='bio')rigBio();if(k==='chi')rigChi();if(k==='eng')rigEng();if(k==='math')rigMath();if(k==='phy')rigP()},150)}
+function rtl(k){const s=S[k];const f=document.getElementById('f-'+k)?.value||'all';const fg=document.getElementById('fg-'+k)?.value||'all';const c=document.getElementById('t-'+k);if(!c)return;
+c.innerHTML=(f==='all'?s.tp:s.tp.filter(t=>t.st===f)).filter(t=>fg==='all'||t.g==+fg).map(t=>{
+const kc=t.kp.length,ec=t.kp.reduce((a,p)=>a+p.ep.length,0);const lb={mastered:'已掌握',studying:'学习中',unlearned:'未掌握'}[t.st];const gn={0:'全年级',1:'初一',2:'初二',3:'初三'}[t.g];const gc=t.g?t.g:0;
+return`<div class="tc s${t.st[0]}" onclick="std('${k}',${t.id})"><h5>专题${t.id}: ${t.t}<span class="gb g${gc}">${gn}</span></h5><div class=nf>📚${kc}个知识点·🎯${ec}个考点</div><span class="stg ${t.st[0]}">${lb}</span></div>`}).join('')}
+function rp(k){const s=S[k];const c=document.getElementById('pro-'+k);if(!c)return;
+const tt=s.tp.length;const m=s.tp.filter(t=>t.st==='mastered').length;const su=s.tp.filter(t=>t.st==='studying').length;const u=s.tp.filter(t=>t.st==='unlearned').length;
+const mp=tt>0?Math.round(m/tt*100):0;const sp=tt>0?Math.round(su/tt*100):0;const up=tt>0?Math.round(u/tt*100):0;
+c.innerHTML=`<div class=pbo><div class="psg m" style=width:${mp}%></div><div class="psg s" style=width:${sp}%></div><div class="psg u" style=width:${up}%></div></div>
+<div class=lg><div class=li><div class=ld style=background:#4caf50></div>已掌握${m}/${tt}(${mp}%)</div>
+<div class=li><div class=ld style=background:#ff9800></div>学习中${su}/${tt}(${sp}%)</div>
+<div class=li><div class=ld style=background:#f44336></div>未掌握${u}/${tt}(${up}%)</div></div>
+<div style=text-align:center;margin-top:8px;font-size:1em>总掌握率：<strong style=color:var(--sg);font-size:1.2em>${mp}%</strong></div>`}
+function rmk(k){const s=S[k];const c=document.getElementById('mk-'+k);if(!c)return;c.innerHTML=s.mk.map(m=>{const i=m.indexOf('：');const t=i>0?m.slice(0,i+1):'';const r=i>0?m.slice(i+1):m;return`<div class=mk><span class=ml>${t}</span>${r}</div>`}).join('')}
+function rsk(k){const s=S[k];const c=document.getElementById('sk-'+k);if(!c)return;c.innerHTML=s.sk.map(m=>{const i=m.indexOf('：');const t=i>0?m.slice(0,i+1):'';const r=i>0?m.slice(i+1):m;return`<div class=sk><span class=sl>${t||'技巧：'}</span>${r}</div>`}).join('')}
+function rig(k){if(k!=='geo')return;const c=document.getElementById('img-'+k);if(!c)return;
+const bp='img/geo/';
+const imgs=[
+{n:'中国地理教育信息图',f:'china_geo_1.jpeg'},
+{n:'世界地理教育信息图',f:'world_geo.jpeg'},
+{n:'地理考试速记思维导图',f:'geo_cheat.jpeg'},
+{n:'地球自转与板块运动',f:'Gemini_Generated_Image_oh3njsoh3njsoh3n.png'},
+{n:'气候类型与经纬网',f:'Gemini_Generated_Image_pqlj2opqlj2opqlj.png'}
+];
+c.innerHTML=imgs.map((img,i)=>`<div style=cursor:pointer onclick="simg(${i})"><img src="${bp+img.f}" alt="${img.n}" loading=lazy onerror="this.style.opacity='0.3';this.nextElementSibling.textContent='图片缺失: ${img.f}'"><div style=text-align:center;padding:4px 0;font-size:.85em;color:var(--text5)>${img.n}</div></div>`).join('')}
+
+function fsz(d){var v=parseInt(localStorage.getItem('km_fsz')||'16');var n=v+d;if(n<12)n=12;if(n>28)n=28;if(n===v)return;localStorage.setItem('km_fsz',String(n));applyFsz(n)}
+function applyFsz(n){document.getElementById('fszV').textContent=String(n);document.body.style.fontSize=n+'px'}
+function initFsz(){var v=parseInt(localStorage.getItem('km_fsz')||'16');applyFsz(v)}
+
+function rigBio(){var c=document.getElementById('img-bio');if(!c)return;var bp='img/bioexp/';var imgs=[{n:'生物实验图1',f:'bio_img_1.png',p:'img/bioexp/'},{n:'生物实验图2',f:'bio_img_2.png',p:'img/bioexp/'},{n:'生物实验图3',f:'bio_img_3.png',p:'img/bioexp/'},{n:'生物实验图4',f:'bio_img_4.png',p:'img/bioexp/'},{n:'生物实验图5',f:'bio_img_5.png',p:'img/bioexp/'},{n:'生物实验图6',f:'bio_img_6.png',p:'img/bioexp/'},{n:'生物实验图7',f:'bio_img_7.png',p:'img/bioexp/'},{n:'生物实验图8',f:'bio_img_8.png',p:'img/bioexp/'},{n:'生物实验图9',f:'bio_img_9.png',p:'img/bioexp/'},{n:'生物实验图10',f:'bio_img_10.png',p:'img/bioexp/'},{n:'生物实验图11',f:'bio_img_11.png',p:'img/bioexp/'}];
+c.innerHTML=imgs.map(function(img,i){return'<div style=cursor:pointer onclick="simgB('+i+')"><img src="'+bp+img.f+'" alt="'+img.n+'" loading=lazy><div style=text-align:center;padding:4px 0;font-size:.85em;color:var(--text5)>'+img.n+'</div></div>'}).join('')}
+function simgB(i){var bp='img/bioexp_hd/';var imgs=[{n:'生物实验图1',f:'bio_img_1.png',p:'img/bioexp_hd/'},{n:'生物实验图2',f:'bio_img_2.png',p:'img/bioexp_hd/'},{n:'生物实验图3',f:'bio_img_3.png',p:'img/bioexp_hd/'},{n:'生物实验图4',f:'bio_img_4.png',p:'img/bioexp_hd/'},{n:'生物实验图5',f:'bio_img_5.png',p:'img/bioexp_hd/'},{n:'生物实验图6',f:'bio_img_6.png',p:'img/bioexp_hd/'},{n:'生物实验图7',f:'bio_img_7.png',p:'img/bioexp_hd/'},{n:'生物实验图8',f:'bio_img_8.png',p:'img/bioexp_hd/'},{n:'生物实验图9',f:'bio_img_9.png',p:'img/bioexp_hd/'},{n:'生物实验图10',f:'bio_img_10.png',p:'img/bioexp_hd/'},{n:'生物实验图11',f:'bio_img_11.png',p:'img/bioexp_hd/'}];
+GI.splice(0,GI.length);for(var k=0;k<imgs.length;k++){GI.push(imgs[k])}GIn=i;GIs=1;document.getElementById('lbi').src=bp+imgs[i].f;GIox=0;GIoy=0;GIap();document.getElementById('lbt').textContent=imgs[i].n+' ('+(i+1)+'/'+imgs.length+')';document.getElementById('lbl').textContent='100%';document.getElementById('lbo').classList.add('act')}
+
+function rigEng(){var c=document.getElementById('img-eng');if(!c)return;var bp='img/eng/';var imgs=[{n:'英语知识图1',f:'eng_img_1.png',p:'img/eng_hd/'},{n:'英语知识图2',f:'eng_img_2.png',p:'img/eng_hd/'},{n:'英语知识图3',f:'eng_img_3.png',p:'img/eng_hd/'},{n:'英语知识图4',f:'eng_img_4.png',p:'img/eng_hd/'},{n:'英语知识图5',f:'eng_img_5.png',p:'img/eng_hd/'},{n:'英语知识图6',f:'eng_img_6.png',p:'img/eng_hd/'},{n:'英语知识图7',f:'eng_img_7.png',p:'img/eng_hd/'},{n:'英语知识图8',f:'eng_img_8.png',p:'img/eng_hd/'},{n:'英语知识图9',f:'eng_img_9.png',p:'img/eng_hd/'},{n:'英语知识图10',f:'eng_img_10.png',p:'img/eng_hd/'},{n:'英语知识图11',f:'eng_img_11.png',p:'img/eng_hd/'},{n:'英语知识图12',f:'eng_img_12.png',p:'img/eng_hd/'},{n:'英语知识图13',f:'eng_img_13.png',p:'img/eng_hd/'},{n:'英语知识图14',f:'eng_img_14.png',p:'img/eng_hd/'}];c.innerHTML=imgs.map(function(img,i){return'<div style=cursor:pointer onclick="simgE('+i+')"><img src="' + bp + img.f + '" alt="' + img.n + '" loading=lazy><div style=text-align:center;padding:4px 0;font-size:.85em;color:var(--text5)>' + img.n + '</div></div>'}).join('')}
+function rigMath(){var c=document.getElementById('img-math');if(!c)return;
+var bp='img/math/';
+var imgs=[{n:'一次函数总复习知识地图',f:'一次函数总复习知识地图.png'},{n:'三角形知识树',f:'三角形知识树.png'},{n:'全等三角形知识地图',f:'全等三角形知识地图.png'},{n:'平行四边形家族知识地图',f:'平行四边形家族知识地图.png'},{n:'平面直角坐标系知识地图',f:'平面直角坐标系知识地图.png'},{n:'等腰与等边三角形知识地图',f:'等腰与等边三角形知识地图.png'},{n:'中考冲刺总规划海报',f:'中考冲刺总规划海报.png'},{n:'数学解题技巧大全冲刺海报',f:'数学解题技巧大全冲刺海报.png'},{n:'初二数学十大易错点冲刺海报',f:'初二数学十大易错点冲刺海报.png'},{n:'AI生成图1',f:'ChatGPT Image 2026年5月24日 00_04_36.png'},{n:'AI生成图2',f:'ChatGPT Image 2026年5月24日 00_06_23.png'},{n:'AI生成图3',f:'ChatGPT Image 2026年5月24日 00_11_13.png'},{n:'AI生成图4',f:'ChatGPT Image 2026年5月24日 00_13_10.png'},{n:'AI生成图5',f:'ChatGPT Image 2026年5月24日 00_15_01.png'}];
+c.innerHTML=imgs.map(function(img,i){return'<div style=cursor:pointer onclick="simgM('+i+')"><img src="'+bp+img.f+'" alt="'+img.n+'" loading=lazy onerror="this.style.opacity=\'0.3\';this.nextElementSibling.textContent=\'图片缺失: '+img.f+'\'"><div style=text-align:center;padding:4px 0;font-size:.85em;color:var(--text5)>'+img.n+'</div></div>'}).join('')}
+
+function rigP(){var c=document.getElementById('img-phy');if(!c)return;var bp='img/phy/';var imgs=[{n:'物理知识图1',f:'1.png'},{n:'物理知识图2',f:'2.png'},{n:'物理知识图3',f:'3.png'},{n:'物理知识图4',f:'4.png'},{n:'物理知识图5',f:'5.png'},{n:'物理知识图6',f:'6.png'},{n:'物理知识图7',f:'7.png'},{n:'物理知识图8',f:'8.png'},{n:'物理知识图9',f:'9.png'},{n:'物理知识图10',f:'10.png'},{n:'物理知识图11',f:'11.png'},{n:'物理知识图12',f:'12.png'},{n:'物理知识图13',f:'13.png'},{n:'物理知识图14',f:'14.png'},{n:'物理知识图15',f:'15.png'},{n:'物理知识图16',f:'16.png'}];c.innerHTML=imgs.map(function(img,i){return'<div style=cursor:pointer onclick="simgP('+i+')"><img src="'+bp+img.f+'" alt="'+img.n+'" loading=lazy onerror="this.style.opacity=\'0.3\';this.nextElementSibling.textContent=\'图片缺失: '+img.f+'\'"><div style=text-align:center;padding:4px 0;font-size:.85em;color:var(--text5)>'+img.n+'</div></div>'}).join('')}
+function simgP(i){var bp='img/phy/';var imgs=[{n:'物理知识图1',f:'1.png'},{n:'物理知识图2',f:'2.png'},{n:'物理知识图3',f:'3.png'},{n:'物理知识图4',f:'4.png'},{n:'物理知识图5',f:'5.png'},{n:'物理知识图6',f:'6.png'},{n:'物理知识图7',f:'7.png'},{n:'物理知识图8',f:'8.png'},{n:'物理知识图9',f:'9.png'},{n:'物理知识图10',f:'10.png'},{n:'物理知识图11',f:'11.png'},{n:'物理知识图12',f:'12.png'},{n:'物理知识图13',f:'13.png'},{n:'物理知识图14',f:'14.png'},{n:'物理知识图15',f:'15.png'},{n:'物理知识图16',f:'16.png'}];GI.splice(0,GI.length);for(var k=0;k<imgs.length;k++){GI.push(imgs[k])}GIn=i;GIs=1;document.getElementById('lbi').src=bp+imgs[i].f;GIox=0;GIoy=0;GIap();document.getElementById('lbt').textContent=imgs[i].n+' ('+(i+1)+'/'+imgs.length+')';document.getElementById('lbl').textContent='100%';document.getElementById('lbo').classList.add('act')}
+
+function simgM(i){var bp='img/math/';var imgs=[{n:'一次函数总复习知识地图',f:'一次函数总复习知识地图.png'},{n:'三角形知识树',f:'三角形知识树.png'},{n:'全等三角形知识地图',f:'全等三角形知识地图.png'},{n:'平行四边形家族知识地图',f:'平行四边形家族知识地图.png'},{n:'平面直角坐标系知识地图',f:'平面直角坐标系知识地图.png'},{n:'等腰与等边三角形知识地图',f:'等腰与等边三角形知识地图.png'},{n:'中考冲刺总规划海报',f:'中考冲刺总规划海报.png'},{n:'数学解题技巧大全冲刺海报',f:'数学解题技巧大全冲刺海报.png'},{n:'初二数学十大易错点冲刺海报',f:'初二数学十大易错点冲刺海报.png'},{n:'AI生成图1',f:'ChatGPT Image 2026年5月24日 00_04_36.png'},{n:'AI生成图2',f:'ChatGPT Image 2026年5月24日 00_06_23.png'},{n:'AI生成图3',f:'ChatGPT Image 2026年5月24日 00_11_13.png'},{n:'AI生成图4',f:'ChatGPT Image 2026年5月24日 00_13_10.png'},{n:'AI生成图5',f:'ChatGPT Image 2026年5月24日 00_15_01.png'}];GI.splice(0,GI.length);for(var k=0;k<imgs.length;k++){GI.push(imgs[k])}GIn=i;GIs=1;document.getElementById('lbi').src=bp+imgs[i].f;GIox=0;GIoy=0;GIap();document.getElementById('lbt').textContent=imgs[i].n+' ('+(i+1)+'/'+imgs.length+')';document.getElementById('lbl').textContent='100%';document.getElementById('lbo').classList.add('act')}
+function rigChi(){var c=document.getElementById('img-chi');if(!c)return;var bp='img/chi/';var imgs=[{n:'语文知识图1',f:'chi_img_1.png',p:'img/chi/'},{n:'语文知识图2',f:'chi_img_2.png',p:'img/chi/'},{n:'语文知识图3',f:'chi_img_3.png',p:'img/chi/'},{n:'语文知识图4',f:'chi_img_4.png',p:'img/chi/'},{n:'语文知识图5',f:'chi_img_5.png',p:'img/chi/'},{n:'语文知识图6',f:'chi_img_6.png',p:'img/chi/'},{n:'语文知识图7',f:'chi_img_7.png',p:'img/chi/'},{n:'语文知识图8',f:'chi_img_8.png',p:'img/chi/'},{n:'语文知识图9',f:'chi_img_9.png',p:'img/chi/'},{n:'语文知识图10',f:'chi_img_10.png',p:'img/chi/'},{n:'语文知识图11',f:'chi_img_11.png',p:'img/chi/'},{n:'语文知识图12',f:'chi_img_12.png',p:'img/chi/'},{n:'语文知识图13',f:'chi_img_13.png',p:'img/chi/'}];c.innerHTML=imgs.map(function(img,i){return'<div style=cursor:pointer onclick="simgC('+i+')"><img src="'+bp+img.f+'" alt="'+img.n+'" loading=lazy><div style=text-align:center;padding:4px 0;font-size:.85em;color:var(--text5)>'+img.n+'</div></div>'}).join('')}
+function simgC(i){var bp='img/chi_hd/';var imgs=[{n:'语文知识图1',f:'chi_img_1.png',p:'img/chi_hd/'},{n:'语文知识图2',f:'chi_img_2.png',p:'img/chi_hd/'},{n:'语文知识图3',f:'chi_img_3.png',p:'img/chi_hd/'},{n:'语文知识图4',f:'chi_img_4.png',p:'img/chi_hd/'},{n:'语文知识图5',f:'chi_img_5.png',p:'img/chi_hd/'},{n:'语文知识图6',f:'chi_img_6.png',p:'img/chi_hd/'},{n:'语文知识图7',f:'chi_img_7.png',p:'img/chi_hd/'},{n:'语文知识图8',f:'chi_img_8.png',p:'img/chi_hd/'},{n:'语文知识图9',f:'chi_img_9.png',p:'img/chi_hd/'},{n:'语文知识图10',f:'chi_img_10.png',p:'img/chi_hd/'},{n:'语文知识图11',f:'chi_img_11.png',p:'img/chi_hd/'},{n:'语文知识图12',f:'chi_img_12.png',p:'img/chi_hd/'},{n:'语文知识图13',f:'chi_img_13.png',p:'img/chi_hd/'}];GI.splice(0,GI.length);for(var k=0;k<imgs.length;k++){GI.push(imgs[k])}GIn=i;GIs=1;document.getElementById('lbi').src=bp+imgs[i].f;GIox=0;GIoy=0;GIap();document.getElementById('lbt').textContent=imgs[i].n+' ('+(i+1)+'/'+imgs.length+')';document.getElementById('lbl').textContent='100%';document.getElementById('lbo').classList.add('act')}
+
+const GI=[];let GIn=-1;let GIs=1;let GIdrag=0,GIox=0,GIoy=0,GIstartX=0,GIstartY=0;
+function simg(i){const bp='img/geo/';
+const imgs=[
+{n:'中国地理教育信息图',f:'china_geo_1.jpeg'},
+{n:'世界地理教育信息图',f:'world_geo.jpeg'},
+{n:'地理考试速记思维导图',f:'geo_cheat.jpeg'},
+{n:'地球自转与板块运动',f:'Gemini_Generated_Image_oh3njsoh3njsoh3n.png'},
+{n:'气候类型与经纬网',f:'Gemini_Generated_Image_pqlj2opqlj2opqlj.png'}
+];
+GI.splice(0,GI.length,...imgs);GIn=i;GIs=1;slb()}
+function slb(){const img=GI[GIn];if(!img)return;const bp=img.p||'img/geo/';
+document.getElementById('lbi').src=bp+img.f;GIox=0;GIoy=0;GIap();
+document.getElementById('lbt').textContent=img.n+' ('+(GIn+1)+'/'+GI.length+')';
+document.getElementById('lbl').textContent=Math.round(GIs*100)+'%';document.getElementById('lbo').classList.add('act')}
+function plb(d){const n=GIn+d;if(n<0||n>=GI.length)return;GIn=n;GIs=1;GIox=0;GIoy=0;slb()}
+function zlb(v){if(v===0){GIs=1;GIox=0;GIoy=0}else{GIs=Math.max(.25,Math.min(4,GIs+v));if(GIs<=1){GIox=0;GIoy=0}};GIap();document.getElementById('lbl').textContent=Math.round(GIs*100)+'%'}
+function clb(){document.getElementById('lbo').classList.remove('act');GIdrag=0;GIox=0;GIoy=0}
+function GIap(){var img=document.getElementById('lbi');img.style.transform='translate('+GIox+'px,'+GIoy+'px) scale('+GIs+')'}
+document.getElementById('lbi').addEventListener('mousedown',function(e){if(GIs<=1)return;e.preventDefault();GIdrag=1;GIstartX=e.clientX-GIox;GIstartY=e.clientY-GIoy;this.style.cursor='grabbing'})
+document.addEventListener('mousemove',function(e){if(!GIdrag)return;GIox=e.clientX-GIstartX;GIoy=e.clientY-GIstartY;GIap()})
+document.addEventListener('mouseup',function(e){if(!GIdrag)return;GIdrag=0;document.getElementById('lbi').style.cursor='grab'})
+document.addEventListener('keydown',function(e){const l=document.getElementById('lbo');if(!l.classList.contains('act'))return;if(e.key==='Escape')clb();if(e.key==='ArrowLeft')plb(-1);if(e.key==='ArrowRight')plb(1);if(e.key==='+'||e.key==='=')zlb(.25);if(e.key==='-')zlb(-.25)})
+document.addEventListener('wheel',function(e){const l=document.getElementById('lbo');if(!l.classList.contains('act'))return;e.preventDefault();zlb(e.deltaY>0?-.1:.1)},{passive:false})
+function ipc(k){const el=document.getElementById('pie-'+k);if(!el||!el.offsetWidth)return;const ch=echarts.init(el);
+const cm={};S[k].tp.forEach(t=>{const cat=t.t.split('的')[0]||t.t.slice(0,4);cm[cat]=(cm[cat]||0)+t.kp.length});
+const dt=Object.entries(cm).map(([k,v])=>({name:k,value:v}));
+const isLight=document.documentElement.getAttribute('data-theme')==='light';
+ch.setOption({tooltip:{trigger:'item',formatter:'{b}:{c}({d}%)'},legend:{orient:'vertical',left:'left',top:'middle',textStyle:{color:isLight?'#666':'#aaa',fontSize:10}},
+series:[{type:'pie',radius:['35%','65%'],center:['55%','50%'],itemStyle:{borderRadius:8,borderColor:isLight?'#fff':'#1a1a2e',borderWidth:2},label:{show:false},emphasis:{label:{show:true,fontSize:16}},labelLine:{show:false},data:dt}]});window.addEventListener('resize',()=>ch.resize())}
+function iwc(k){const el=document.getElementById('cloud-'+k);if(!el||!el.offsetWidth)return;
+try{const ch=echarts.init(el);const kw={'bio':['显微镜','细胞结构','光合作用','呼吸作用','遗传','变异','生态系统','食物链','消化系统','循环系统','呼吸系统','神经系统','激素调节','传染病','免疫','种子萌发','进化','反射','基因','染色体'],'geo':['经纬网','地形地势','气候类型','季风气候','河流','长江','黄河','等高线','比例尺','人口分布','农业','工业','交通运输','秦岭淮河','青藏高原','西北地区','北方地区','南方地区','板块','自然资源'],'chi':['字音字形','词语辨析','成语运用','病句修改','标点符号','文学常识','文言文','古诗鉴赏','阅读理解','写作','修辞手法','表达方式','说明方法','论证方法','默写'],'math':['实数','整式','分式','方程','不等式','函数','一次函数','反比例函数','二次函数','三角形','四边形','圆','统计','概率','三视图','平移旋转','对称'],'eng':['词汇','时态','被动语态','非谓语动词','宾语从句','定语从句','完形填空','阅读理解','书面表达','情景交际','固定搭配','词义辨析','语法填空'],'phy':['声现象','光现象','反射','折射','凸透镜成像','惯性','摩擦力','压强','浮力','阿基米德','杠杆','滑轮','机械效率','比热容','欧姆定律','电功率','电磁感应'],'chem':['物理变化','化学变化','实验操作','氧气','二氧化碳','分子原子','元素','化学式','化学方程式','质量守恒','金属活动性','溶液','溶解度','酸碱中和','pH','复分解反应'],'his':['分封制','商鞅变法','百家争鸣','秦始皇','汉武帝','丝绸之路','科举制','郑和下西洋','鸦片战争','辛亥革命','五四运动','长征','抗日战争','改革开放','工业革命','冷战'],'pol':['中学时代','友谊','师生关系','孝亲敬长','生命','青春','情绪','集体','法律特征','权利义务','人大制度','共同富裕','创新','民主','法治','社会主义核心价值观']}[k]||['经纬网','地形地势','气候类型','季风气候','河流','长江','黄河','等高线','比例尺','人口分布','农业','工业','交通运输','秦岭淮河','青藏高原','西北地区','北方地区','南方地区','板块','自然资源'];
+const dt=kw.map((w,i)=>({name:w,value:100-i*3}));
+ch.setOption({tooltip:{show:true},series:[{type:'wordCloud',gridSize:6,sizeRange:[10,50],rotationRange:[-90,90],shape:'circle',width:'100%',height:'100%',drawOutOfBound:false,
+textStyle:{fontFamily:'Microsoft YaHei',fontWeight:'bold',color:()=>['#e94560','#0f3460','#533483','#2196f3','#4caf50','#ff9800','#00bcd4'][Math.floor(Math.random()*7)]},emphasis:{focus:'self',textStyle:{shadowBlur:10,shadowColor:'#333'}},data:dt}]});window.addEventListener('resize',()=>ch.resize())}catch(e){}}
+function ispc(k){const s=S[k];const el=document.getElementById('spie-'+k);if(!el||!el.offsetWidth)return;const ch=echarts.init(el);
+const tt=s.tp.length;const m=s.tp.filter(t=>t.st==='mastered').length;const su=s.tp.filter(t=>t.st==='studying').length;const u=s.tp.filter(t=>t.st==='unlearned').length;
+const isLight=document.documentElement.getAttribute('data-theme')==='light';
+ch.setOption({tooltip:{trigger:'item',formatter:'{b}:{c}个({d}%)'},color:['#4caf50','#ff9800','#f44336'],legend:{orient:'vertical',left:'left',top:'middle',textStyle:{color:isLight?'#666':'#aaa',fontSize:10}},
+series:[{type:'pie',radius:['40%','70%'],center:['55%','50%'],itemStyle:{borderRadius:8,borderColor:isLight?'#fff':'#1a1a2e',borderWidth:2},label:{show:false},emphasis:{label:{show:true,fontSize:16}},data:[{name:'已掌握',value:m},{name:'学习中',value:su},{name:'未掌握',value:u}]}]});window.addEventListener('resize',()=>ch.resize())}
+function ikg(k){const c=document.getElementById('graph-'+k);if(!c)return;
+const rels=R[k]||[];const s=S[k];const nds=s.tp.map(t=>({id:t.t,name:t.t.length>12?t.t.slice(0,12)+'...':t.t,full:t.t,st:t.st,val:t.kp.length}));
+const lks=rels.filter(r=>nds.some(n=>n.id===r.src)&&nds.some(n=>n.id===r.tgt)).map(r=>({source:r.src,target:r.tgt,tp:r.tp,d:r.d}));
+const w=c.clientWidth||800;const h=c.clientHeight||430;c.innerHTML='';const svg=d3.select(c).append('svg').attr('width',w).attr('height',h).style('cursor','grab');
+ svg.append('defs');
+ const g=svg.append('g');
+ const zoom=d3.zoom().scaleExtent([0.3,3]).on('zoom',(e)=>{g.attr('transform',e.transform)});
+ svg.call(zoom);
+ const sim=d3.forceSimulation(nds).force('link',d3.forceLink(lks).id(d=>d.id).distance(110)).force('charge',d3.forceManyBody().strength(-200)).force('center',d3.forceCenter(w/2,h/2)).force('collision',d3.forceCollide(35));
+ lks.forEach((r,i)=>{svg.select('defs').append('marker').attr('id','a-'+k+'-'+i).attr('markerWidth',10).attr('markerHeight',8).attr('refX',22).attr('refY',4).attr('orient','auto').append('path').attr('d','M0,0L10,4L0,8').attr('fill','#6a6a9a')});
+const lk=g.append('g').selectAll('line').data(lks).join('line').attr('stroke',function(){const isLight=document.documentElement.getAttribute('data-theme')==='light';return isLight?'#5a5a7a':'#7a7aaa'}).attr('stroke-width',2.5).attr('stroke-dasharray','6,3').attr('marker-end',(d,i)=>'url(#a-'+k+'-'+i+')');
+const cm={mastered:'#4caf50',studying:'#ff9800',unlearned:'#f44336'};
+const nd=g.append('g').selectAll('g').data(nds).join('g').style('cursor','pointer').on('click',(e,d)=>{const t=s.tp.find(t=>t.t===d.id);if(t)std(k,t.id)}).call(d3.drag().on('start',(e)=>{if(!e.active)sim.alphaTarget(.3).restart();e.subject.fx=e.subject.x;e.subject.fy=e.subject.y}).on('drag',(e)=>{e.subject.fx=e.x;e.subject.fy=e.y}).on('end',(e)=>{if(!e.active)sim.alphaTarget(0);e.subject.fx=null;e.subject.fy=null}));
+nd.append('circle').attr('r',d=>8+d.val*1.5).attr('fill',d=>cm[d.st]||'888').attr('stroke','#1a1a2e').attr('stroke-width',2.5).style('opacity',.9);
+nd.append('title').text(d=>d.full+'\n知识点:'+d.val+'\n状态:'+({mastered:'已掌握',studying:'学习中',unlearned:'未掌握'}[d.st]));
+nd.append('text').text(d=>d.name).attr('x',0).attr('y',d=>-(14+d.val*1.5)).attr('text-anchor','middle').attr('fill',function(){const isLight=document.documentElement.getAttribute('data-theme')==='light';return isLight?'#444':'#fff'}).attr('font-size',15).attr('font-weight','bold').style('pointer-events','none');
+const ll=g.append('g').selectAll('.ll').data(lks).join('text').attr('class','ll').text(d=>d.tp).attr('font-size',14).attr('fill',function(){const isLight=document.documentElement.getAttribute('data-theme')==='light';return isLight?'#222':'#fff'}).attr('stroke',function(){const isLight=document.documentElement.getAttribute('data-theme')==='light';return isLight?'#ff0':'#000'}).attr('stroke-width',3).attr('paint-order','stroke').attr('stroke-linecap','round').attr('stroke-linejoin','round').attr('text-anchor','middle').attr('font-weight','bold').style('opacity',1);
+sim.on('tick',()=>{lk.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);ll.attr('x',d=>(d.source.x+d.target.x)/2).attr('y',d=>(d.source.y+d.target.y)/2);nd.attr('transform',d=>'translate('+d.x+','+d.y+')')});
+sim.on('end',()=>{const xs=nds.map(d=>d.x),ys=nds.map(d=>d.y);const mx=Math.min(...xs),Mx=Math.max(...xs),my=Math.min(...ys),My=Math.max(...ys);const sw=Mx-mx+100,sh=My-my+100;const sc=Math.min(w/sw,h/sh,1.2);const tx=w/2-(mx+Mx)/2*sc,ty=h/2-(my+My)/2*sc;svg.transition().duration(800).call(zoom.transform,d3.zoomIdentity.translate(tx,ty).scale(sc))})}
+function std(k,id){const s=S[k];const t=s.tp.find(t=>t.id===id);if(!t)return;_dlNav={type:'std',subtype:k,list:s.tp,idx:s.tp.findIndex(function(i){return i.id===id})};
+const lb={mastered:'已掌握',studying:'学习中',unlearned:'未掌握'}[t.st];const cl={mastered:'#4caf50',studying:'#ff9800',unlearned:'#f44336'}[t.st];const ec=t.kp.reduce((a,p)=>a+p.ep.length,0);const gn={0:'全年级',1:'初一',2:'初二',3:'初三'}[t.g];const gc=t.g?t.g:0;
+document.getElementById('mct').innerHTML=`<div style=display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px><h2 style=margin:0>专题${t.id}:${t.t} <span class="gb g${gc}">${gn}</span></h2><span style=font-size:.85em;padding:3px 12px;border-radius:12px;background:${cl}22;color:${cl};font-weight:bold>${lb}</span></div>
+<p style=color:var(--text5);margin-bottom:12px>📚${t.kp.length}个知识点·🎯${ec}个考点方向</p>
+${t.kp.map((p,i)=>`<div style=background:var(--card-bg3);border-radius:8px;padding:14px;margin-bottom:12px;border:1px solid var(--border)><h3>${i+1}.${p.n}</h3><p>${p.ex.replace(/\n/g,'<br>')}</p>${p.ep.length?`<div class=exs><strong style=color:#2196f3>🎯考题方向</strong><ol style=margin-top:6px>${p.ep.map(e=>`<li>${e}</li>`).join('')}</ol></div>`:''}${p.q?`<div class=qss onclick="tq('qsa-kp-${k}-${t.id}-${i}')" style=cursor:pointer><strong style=color:#ff9800>📝例题</strong><span style=color:var(--text5);font-size:.78em;margin-left:6px>👆点此切换答案</span><p style=margin-top:6px><strong>题目：</strong>${p.q}</p><div class=qsa id=qsa-kp-${k}-${t.id}-${i}><strong>✅ 答案：</strong>${p.a}</div></div>`:''}</div>`).join('')}
+${t.qs&&t.qs.length?`<div class=sec><div class=st><span class=ac>📝</span>练习题</div>${t.qs.map((qs,i)=>`<div class=qs-item onclick="tq('qsa-${k}-${t.id}-${i}')" style=cursor:pointer><div class=qsq><strong>${i+1}.</strong> ${qs.q}<span style=color:var(--text5);font-size:.78em;margin-left:6px>👆点此切换答案</span>${qs.kp?`<div class=qsk>关联：${qs.kp}</div>`:''}<div class=qsa id="qsa-${k}-${t.id}-${i}">答案：${qs.a}</div></div></div>`).join('')}</div>`:''}
+<div class=sbs><span style=color:var(--text5);font-size:.85em;align-self:center>更改掌握状态：</span><button class=btn-g onclick="cts('${k}',${t.id},'mastered')">✅已掌握</button><button class=btn-o onclick="cts('${k}',${t.id},'studying')">📖学习中</button><button class=btn-r onclick="cts('${k}',${t.id},'unlearned')">❌未掌握</button></div>`;
+document.getElementById('mol').classList.add('act')}
+function tq(id){var e=document.getElementById(id);if(!e)return;var s=e.getAttribute('style');if(s&&s.indexOf('display:block')>=0){e.style.display='none'}else{e.style.display='block'}}
+function tqs(k,id,i){var el=document.getElementById('qsa-'+k+'-'+id+'-'+i);if(!el)return;var s=el.getAttribute('style');if(s&&s.indexOf('display:block')>=0){el.style.display='none'}else{el.style.display='block'}}
+function cm(){document.getElementById('mol').classList.remove('act')}
+function cts(k,id,st){const t=S[k].tp.find(t=>t.id===id);if(t){var old=t.st;t.st=st;saveS();rgs();rsd(k);std(k,id);trc_add({ts:Date.now(),k:k,id:id,n:t.t,old:old,new:st})}}
+function gsp(k){const s=S[k];const ul=s.tp.filter(t=>t.st==='unlearned');const sl=s.tp.filter(t=>t.st==='studying');
+if(!ul.length&&!sl.length){alert('🎉全部已掌握！');return}const c=document.getElementById('plan-'+k);if(!c)return;
+const pri=[...ul,...sl];let html=`<div class=st><span class=ac>📋</span>推荐学习计划(${s.n})</div>`;
+for(let d=0;d<Math.min(pri.length,6);d++){const t=pri[d];const ec=t.kp.reduce((a,p)=>a+p.ep.length,0);const em=t.kp.length*15+ec*5;
+html+=`<div class=pc><div class=dy>${d===0?'🔥今晚优先学':d===1?'📌明天学习':'📅第'+(d+1)+'次学习'}<span style=font-weight:400;color:var(--text5);font-size:.8em;margin-left:8px>${t.st==='unlearned'?'⚠️未掌握·优先':'📖学习中·巩固'}</span></div>
+<div class=it>${t.kp.map((p,i)=>`<div class=itm><span class=tn>${i+1}.${p.n}</span><span style=color:var(--text5);font-size:.75em>🎯${p.ep.length}个考点</span></div>`).join('')}
+<div class=itm style=border-bottom:none;padding-top:4px><span style=color:var(--text5);font-size:.8em>⏱约${em}分钟·${t.kp.length}个知识点·${ec}个考点</span><span style=color:var(--sac);font-size:.8em;cursor:pointer onclick="std('${k}',${t.id})">👀查看详情</span></div></div></div>`}
+if(pri.length>6)html+=`<p style=color:var(--text5);text-align:center;margin-top:8px>...还有${pri.length-6}个专题待学习</p>`;c.innerHTML=html;c.scrollIntoView({behavior:'smooth',block:'start'})}
+
+// ====== 语文深度学习 ======
+const CD = {
+  poems: [
+    {id:1,t:'关雎',a:'诗经',d:'先秦',c:'关关雎鸠，在河之洲。窈窕淑女，君子好逑。参差荇菜，左右流之。窈窕淑女，寤寐求之。求之不得，寤寐思服。悠哉悠哉，辗转反侧。参差荇菜，左右采之。窈窕淑女，琴瑟友之。参差荇菜，左右芼之。窈窕淑女，钟鼓乐之。',e:'雎鸠、窈窕、荇、寤寐、辗转、芼',m:'比兴手法，表达对美好爱情的追求',s:'unlearned'},
+    {id:2,t:'蒹葭',a:'诗经',d:'先秦',c:'蒹葭苍苍，白露为霜。所谓伊人，在水一方。溯洄从之，道阻且长。溯游从之，宛在水中央。蒹葭萋萋，白露未晞。所谓伊人，在水之湄。溯洄从之，道阻且跻。溯游从之，宛在水中坻。蒹葭采采，白露未已。所谓伊人，在水之涘。溯洄从之，道阻且右。溯游从之，宛在水中沚。',e:'蒹葭、溯洄、晞、湄、跻、坻、涘、沚',m:'对理想的不懈追求，意境朦胧优美',s:'unlearned'},
+    {id:3,t:'式微',a:'诗经',d:'先秦',c:'式微，式微，胡不归？微君之故，胡为乎中露？式微，式微，胡不归？微君之躬，胡为乎泥中？',e:'式微、微',m:'表达劳动者的不满情绪',s:'unlearned'},
+    {id:4,t:'子衿',a:'诗经',d:'先秦',c:'青青子衿，悠悠我心。纵我不往，子宁不嗣音？青青子佩，悠悠我思。纵我不往，子宁不来？挑兮达兮，在城阙兮。一日不见，如三月兮。',e:'衿、嗣、阙',m:'表达对恋人的思念之情',s:'unlearned'},
+    {id:5,t:'送杜少府之任蜀州',a:'王勃',d:'唐',c:'城阙辅三秦，风烟望五津。与君离别意，同是宦游人。海内存知己，天涯若比邻。无为在歧路，儿女共沾巾。',e:'阙、宦、歧',m:'"海内存知己天涯若比邻"豁达离别之情',s:'unlearned'},
+    {id:6,t:'望洞庭湖赠张丞相',a:'孟浩然',d:'唐',c:'八月湖水平，涵虚混太清。气蒸云梦泽，波撼岳阳城。欲济无舟楫，端居耻圣明。坐观垂钓者，徒有羡鱼情。',e:'涵、虚、楫、端',m:'"气蒸云梦泽波撼岳阳城"气势磅礴',s:'unlearned'},
+    {id:7,t:'题破山寺后禅院',a:'常建',d:'唐',c:'清晨入古寺，初日照高林。曲径通幽处，禅房花木深。山光悦鸟性，潭影空人心。万籁此都寂，但余钟磬音。',e:'径、禅、籁、磬',m:'"曲径通幽处"禅意宁静',s:'unlearned'},
+    {id:8,t:'送友人',a:'李白',d:'唐',c:'青山横北郭，白水绕东城。此地一为别，孤蓬万里征。浮云游子意，落日故人情。挥手自兹去，萧萧班马鸣。',e:'郭、蓬、萧',m:'"浮云游子意落日故人情"惜别',s:'unlearned'},
+    {id:9,t:'卜算子·黄州定慧院寓居作',a:'苏轼',d:'宋',c:'缺月挂疏桐，漏断人初静。谁见幽人独往来，缥缈孤鸿影。惊起却回头，有恨无人省。拣尽寒枝不肯栖，寂寞沙洲冷。',e:'桐、缥缈、省、栖',m:'"拣尽寒枝不肯栖"孤独高洁',s:'unlearned'},
+    {id:10,t:'卜算子·我住长江头',a:'李之仪',d:'宋',c:'我住长江头，君住长江尾。日日思君不见君，共饮长江水。此水几时休，此恨何时已。只愿君心似我心，定不负相思意。',e:'休、已',m:'语言朴素真挚，深切思念',s:'unlearned'},
+    {id:11,t:'茅屋为秋风所破歌',a:'杜甫',d:'唐',c:'八月秋高风怒号，卷我屋上三重茅。茅飞渡江洒江郊，高者挂罥长林梢，下者飘转沉塘坳。南村群童欺我老无力，忍能对面为盗贼。公然抱茅入竹去，唇焦口燥呼不得，归来倚杖自叹息。俄顷风定云墨色，秋天漠漠向昏黑。布衾多年冷似铁，娇儿恶卧踏里裂。床头屋漏无干处，雨脚如麻未断绝。自经丧乱少睡眠，长夜沾湿何由彻！安得广厦千万间，大庇天下寒士俱欢颜！风雨不动安如山。呜呼！何时眼前突兀见此屋，吾庐独破受冻死亦足！',e:'罥、坳、衾、丧',m:'忧国忧民，"安得广厦千万间"千古名句',s:'unlearned'},
+    {id:12,t:'卖炭翁',a:'白居易',d:'唐',c:'卖炭翁，伐薪烧炭南山中。满面尘灰烟火色，两鬓苍苍十指黑。卖炭得钱何所营？身上衣裳口中食。可怜身上衣正单，心忧炭贱愿天寒。夜来城外一尺雪，晓驾炭车辗冰辙。牛困人饥日已高，市南门外泥中歇。翩翩两骑来是谁？黄衣使者白衫儿。手把文书口称敕，回车叱牛牵向北。一车炭，千余斤，宫使驱将惜不得。半匹红纱一丈绫，系向牛头充炭直。',e:'鬓、辗、翩翩、敕、叱、绫',m:'讽刺宫市，同情劳动人民',s:'unlearned'},
+    {id:13,t:'野望',a:'王绩',d:'唐',c:'东皋薄暮望，徙倚欲何依。树树皆秋色，山山唯落晖。牧人驱犊返，猎马带禽归。相顾无相识，长歌怀采薇。',e:'徙、晖、犊、薇',m:'田园归隐之情',s:'unlearned'},
+    {id:14,t:'黄鹤楼',a:'崔颢',d:'唐',c:'昔人已乘黄鹤去，此地空余黄鹤楼。黄鹤一去不复返，白云千载空悠悠。晴川历历汉阳树，芳草萋萋鹦鹉洲。日暮乡关何处是？烟波江上使人愁。',e:'鹦鹉、萋萋',m:'思乡怀古之情',s:'unlearned'},
+    {id:15,t:'使至塞上',a:'王维',d:'唐',c:'单车欲问边，属国过居延。征蓬出汉塞，归雁入胡天。大漠孤烟直，长河落日圆。萧关逢候骑，都护在燕然。',e:'征蓬、候骑、燕然',m:'"大漠孤烟直长河落日圆"雄浑壮阔',s:'unlearned'},
+    {id:16,t:'渡荆门送别',a:'李白',d:'唐',c:'渡远荆门外，来从楚国游。山随平野尽，江入大荒流。月下飞天镜，云生结海楼。仍怜故乡水，万里送行舟。',e:'荆门、荒',m:'"山随平野尽江入大荒流"壮阔',s:'unlearned'},
+    {id:17,t:'钱塘湖春行',a:'白居易',d:'唐',c:'孤山寺北贾亭西，水面初平云脚低。几处早莺争暖树，谁家新燕啄春泥。乱花渐欲迷人眼，浅草才能没马蹄。最爱湖东行不足，绿杨阴里白沙堤。',e:'莺、啄、堤',m:'早春美景的喜悦',s:'unlearned'},
+    {id:18,t:'饮酒（其五）',a:'陶渊明',d:'东晋',c:'结庐在人境，而无车马喧。问君何能尔？心远地自偏。采菊东篱下，悠然见南山。山气日夕佳，飞鸟相与还。此中有真意，欲辨已忘言。',e:'庐、篱、辨',m:'"采菊东篱下悠然见南山"田园之乐',s:'unlearned'},
+    {id:19,t:'春望',a:'杜甫',d:'唐',c:'国破山河在，城春草木深。感时花溅泪，恨别鸟惊心。烽火连三月，家书抵万金。白头搔更短，浑欲不胜簪。',e:'溅、搔、簪',m:'忧国思家，"家书抵万金"',s:'unlearned'},
+    {id:20,t:'雁门太守行',a:'李贺',d:'唐',c:'黑云压城城欲摧，甲光向日金鳞开。角声满天秋色里，塞上燕脂凝夜紫。半卷红旗临易水，霜重鼓寒声不起。报君黄金台上意，提携玉龙为君死。',e:'摧、鳞、脂',m:'"黑云压城城欲摧"战争场面',s:'unlearned'},
+    {id:21,t:'渔家傲',a:'李清照',d:'宋',c:'天接云涛连晓雾，星河欲转千帆舞。仿佛梦魂归帝所，闻天语，殷勤问我归何处。我报路长嗟日暮，学诗谩有惊人句。九万里风鹏正举。风休住，蓬舟吹取三山去！',e:'涛、谩、蓬',m:'豪放之作，追求理想',s:'unlearned'}
+  ],
+  essays: [
+    {id:1,t:'桃花源记',a:'陶渊明',d:'东晋',k:'土地平旷，屋舍俨然，有良田、美池、桑竹之属。黄发垂髫，并怡然自乐。',m:'描绘理想社会，向往美好生活',s:'unlearned'},
+    {id:2,t:'小石潭记',a:'柳宗元',d:'唐',k:'潭中鱼可百许头，皆若空游无所依。潭西南而望，斗折蛇行，明灭可见。',m:'幽静环境，被贬孤寂心情',s:'unlearned'},
+    {id:3,t:'核舟记',a:'魏学洢',d:'明',k:'舟首尾长约八分有奇，高可二黍许。中轩敞者为舱，箬篷覆之。',m:'赞美雕刻技艺精湛',s:'unlearned'},
+    {id:4,t:'马说',a:'韩愈',d:'唐',k:'世有伯乐，然后有千里马。千里马常有，而伯乐不常有。策之不以其道，食之不能尽其材。',m:'怀才不遇的愤懑',s:'unlearned'},
+    {id:5,t:'北冥有鱼',a:'庄子',d:'战国',k:'鹏之徙于南冥也，水击三千里，抟扶摇而上者九万里，去以六月息者也。',m:'追求精神自由',s:'unlearned'},
+    {id:6,t:'虽有嘉肴',a:'礼记',d:'战国',k:'虽有嘉肴，弗食，不知其旨也；虽有至道，弗学，不知其善也。',m:'强调实践的重要性',s:'unlearned'},
+    {id:7,t:'大道之行也',a:'礼记',d:'战国',k:'大道之行也，天下为公。选贤与能，讲信修睦。',m:'描绘理想社会"大同"',s:'unlearned'},
+    {id:8,t:'答谢中书书',a:'陶弘景',d:'南朝',k:'山川之美，古来共谈。晓雾将歇，猿鸟乱鸣。夕日欲颓，沉鳞竞跃。',m:'山水之美，归隐之乐',s:'unlearned'}
+  ],
+  errors: [
+    {t:'形近字混淆',d:'窈窕↔窈鸠、雎鸠↔睢鸠、蒹葭↔葭荚、溯洄↔溯洄','m':'注意偏旁部首，形声字形旁表义'},
+    {t:'笔画易错',d:'辗转(车字旁)、徙倚(彳亻)、罥(罒字头)、簪(日字底)','m':'慢写多练，一笔一画写清楚'},
+    {t:'同音字混淆',d:'衿/襟、嗣/司、阙/缺、燕/雁','m':'结合字义和语境区分'},
+    {t:'阅读易错',d:'概括不完整(缺要素)、分析人物(不结合事例)、赏析句子(只谈修辞不谈情感)','m':'套用答题模板，规范作答'},
+    {t:'作文易错',d:'审题偏题、立意浅显、选材陈旧、开头冗长','m':'圈关键词找准题眼，以小见大深入立意'}
+  ],
+  plans: [
+    {d:'早读',t:'20分钟',c:'古诗词背诵 + 默写纠错',m:'每天背1首，先理解后记忆'},
+    {d:'课间',t:'10分钟',c:'文言文实词虚词',m:'随身卡片，随时记忆'},
+    {d:'午休',t:'30分钟',c:'阅读理解练习',m:'做题总结，掌握答题模板'},
+    {d:'晚自习',t:'40分钟',c:'作文训练或系统复习',m:'写作练习或错题整理'}
+  ],
+  exam: [
+    {t:'基础知识',s:'10-15分',l:'★★☆☆☆',p:'每天练习10分钟，总结易错字'},
+    {t:'古诗文默写',s:'10分',l:'★★☆☆☆',p:'熟背必背篇目，注意易错字'},
+    {t:'文言文阅读',s:'15分',l:'★★★☆☆',p:'掌握实词虚词，会翻译'},
+    {t:'古诗词鉴赏',s:'5-8分',l:'★★★★☆',p:'理解主旨，掌握鉴赏方法'},
+    {t:'现代文阅读',s:'30-35分',l:'★★★★☆',p:'掌握答题模板规范作答'},
+    {t:'名著阅读',s:'5-8分',l:'★★★☆☆',p:'读名著做笔记'},
+    {t:'作文',s:'50分',l:'★★★★☆',p:'多读多写积累素材'}
+  ]
+};
+// 深度解析数据
+CD.poemDetail = {
+  1:{b:'《关雎》是《诗经》开篇之作，运用"兴"的手法，以雎鸠和鸣起兴，引出君子对淑女的追求。全诗以"流之""采之""芼之"表现追求过程的层层递进。',k:['比兴手法：以雎鸠和鸣引出爱情主题','重章叠句：反复咏唱增强感染力','琴瑟友之、钟鼓乐之：从追求到和谐的递进'],q:[{t:'《关雎》中"窈窕淑女，君子好逑"运用了什么手法？',a:'起兴(比兴)。以雎鸠和鸣起兴，引出君子对淑女的追求'},{t:'《关雎》表达了怎样的思想感情？',a:'表达了对美好爱情的向往和追求，体现了古代青年男女真挚热烈的感情'}]},
+  2:{b:'《蒹葭》以秋日清晨蒹葭上的白露起兴，营造朦胧凄美的意境。全诗三章重章叠唱，"伊人"可指意中人，也可象征美好理想。"在水一方"成为中国人表达"可望而不可即"的经典意象。',k:['意境朦胧：秋水蒹葭营造凄美氛围','重章叠句：三章反复强调追求的执着','象征手法：伊人象征理想/爱情'],q:[{t:'(《蒹葭》)分析"蒹葭苍苍，白露为霜"的意境。',a:'以秋日清晨蒹葭苍苍、白露成霜的萧瑟景象，营造出朦胧凄美的意境，烘托了诗人求而不得的惆怅心情'},{t:'《蒹葭》的主题是什么？',a:'表达对美好理想或意中人的执着追求，以及求而不得的惆怅'}]},
+  3:{b:'《式微》是《诗经·邶风》中的一篇，以设问方式反复诘问"胡不归"，揭露了统治者不体恤劳动人民的残酷现实。全诗语言质朴，感情强烈，是《诗经》中反映社会矛盾的代表作。',k:['设问手法：反复"胡不归"加强语气','对比：君之故/君之躬与中露/泥中的艰辛','语言质朴：直抒胸臆不事雕琢'],q:[{t:'(《式微》)"式微式微，胡不归"运用了什么修辞？',a:'设问(反复)。以反复诘问的形式，加强语气，表达了劳动者的不满和愤慨'}]},
+  4:{b:'《子衿》描写一位女子在城楼上等候恋人，表达了对恋人的深深思念。"一日不见，如三月兮"成为表达思念的千古名句。',k:['心理描写：通过动作"挑兮达兮"展现焦灼','夸张手法："一日不见，如三月兮"','名句赏析：思念之情的极致表达'],q:[{t:'(《子衿》)"青青子衿，悠悠我心"表达了什么情感？',a:'表达了女子对恋人的深切思念，用青青的衣领代指恋人，含蓄而深情'}]},
+  5:{b:'王勃为"初唐四杰"之首，"海内存知己，天涯若比邻"一扫以往送别诗的悲凉伤感，意境开阔，格调高昂。',k:['意境开阔：豪迈豁达的离别之情','名句赏析："海内存知己，天涯若比邻"','与一般送别诗不同：不写眼泪写豪情'],q:[{t:'(《送杜少府之任蜀州》)"海内存知己，天涯若比邻"为什么成为千古名句？',a:'化用"四海之内皆兄弟"之意，表达真正的友谊超越时空限制，乐观豁达，意境开阔'}]},
+  6:{b:'孟浩然投赠张九龄的干谒诗。"气蒸云梦泽，波撼岳阳城"写洞庭湖的壮阔气势，后四句委婉表达渴望出仕的心情，不卑不亢。',k:['写景气象："气蒸云梦泽，波撼岳阳城"雄浑壮阔','干谒诗特点：委婉表达求仕之心','用典："羡鱼情"化用"临渊羡鱼，不如退而结网"'],q:[{t:'(《望洞庭湖赠张丞相》)"气蒸云梦泽，波撼岳阳城"的"蒸"和"撼"妙在何处？',a:'"蒸"写出湖水蒸腾的磅礴气势，"撼"写出波浪摇撼岳阳城的震撼力，两字极具动态感，展现洞庭湖的壮阔'}]},
+  7:{b:'常建《题破山寺后禅院》以清晨入古寺为线索，由外到内描写禅院的清幽宁静。"曲径通幽处，禅房花木深"写出寺庙的幽深静谧境界。',k:['移步换景：由入寺到禅房的游览顺序','以动衬静：山光悦鸟、潭影空人心','名句赏析："曲径通幽处"的意境美'],q:[{t:'(《题破山寺后禅院》)"曲径通幽处，禅房花木深"营造了怎样的意境？',a:'曲折的小路通向幽深处，禅房深藏在花木丛中，营造出佛门清净幽深、超然物外的意境'}]},
+  8:{b:'李白送别诗的别样之作。"浮云游子意，落日故人情"以浮云比喻游子的飘忽不定，以落日烘托对友人的留恋之情。',k:['情景交融：浮云/落日/孤蓬/班马皆含情','比喻手法："浮云游子意"以浮云喻游子','意象赏析：萧萧班马鸣以声写情'],q:[{t:'(《送友人》)"浮云游子意，落日故人情"用了什么手法？',a:'比喻+借景抒情。以浮云喻游子行踪不定，以落日烘托对友人的留恋，情景交融含蓄隽永'}]},
+  9:{b:'苏轼被贬黄州时所作，借月夜孤鸿表达孤独高洁的情操。"拣尽寒枝不肯栖"暗含作者坚守节操、不肯随波逐流的人生态度。',k:['托物言志：借孤鸿表达高洁情操','意象解读：缺月/疏桐/孤鸿/寒枝','创作背景：苏轼被贬黄州时的孤寂处境'],q:[{t:'(《卜算子·黄州定慧院寓居作》)"拣尽寒枝不肯栖"表达了作者怎样的品格？',a:'以孤鸿不肯栖于寒枝，象征作者即使身处逆境也坚守节操、不肯同流合污的高洁品格'}]},
+  10:{b:'李之仪以长江起兴，通过"共饮长江水"的巧妙构思，表达虽隔千里却心心相印的深情。"只愿君心似我心"质朴而动人。',k:['比兴手法：以长江水起兴','语言特色：朴素真挚口语化','结构回环：长江头↔长江尾的空间对比'],q:[{t:'(《卜算子·我住长江头》)"共饮长江水"妙在何处？',a:'以"共饮长江水"巧妙连接相隔两岸的恋人，虽不能相见但同饮一江水，空间距离中蕴含着割不断的联系'}]},
+  11:{b:'杜甫晚年流寓成都时所作，全诗层层递进：先写秋风破屋的狼狈，再写群童抱茅的无奈，继而写长夜沾湿的苦痛，最后推己及人发出"安得广厦千万间"的宏愿，体现了杜甫"诗圣"的博大胸怀。',k:['叙事层次：风破屋→童抱茅→夜难眠→发宏愿','细节描写："唇焦口燥呼不得""娇儿恶卧踏里裂"','升华主旨：由个人不幸推及天下寒士'],q:[{t:'(《茅屋为秋风所破歌》)诗歌结尾"安得广厦千万间，大庇天下寒士俱欢颜"表达了诗人怎样的情感？',a:'表达了诗人推己及人、忧国忧民的博大胸怀和崇高理想'}]},
+  12:{b:'白居易新乐府诗的代表作，通过卖炭翁的悲惨遭遇，揭露了"宫市"对劳动人民的残酷剥削。"可怜身上衣正单，心忧炭贱愿天寒"是矛盾心理的经典描写。',k:['矛盾心理："衣正单"却"愿天寒"','对比手法：老翁的艰辛与宫使的跋扈','语言特色：通俗易懂如话家常'],q:[{t:'(《卖炭翁》)"可怜身上衣正单，心忧炭贱愿天寒"运用了什么手法？',a:'心理对比(矛盾心理)。通过卖炭翁衣衫单薄却希望天更冷的矛盾心理，深刻表现了生活的艰辛和无奈'},{t:'(《卖炭翁》)结尾"半匹红纱一丈绫，系向牛头充炭直"有何深意？',a:'一车千余斤的炭只换得"半匹红纱一丈绫"，揭露了宫市掠夺的本质，表达了作者对劳动人民的深切同情'}]},
+  13:{b:'王绩辞官归隐后所作，写秋天傍晚的山野景色。"树树皆秋色，山山唯落晖"描绘萧瑟静谧的秋景，末句"长歌怀采薇"借伯夷叔齐的典故表达归隐之志。',k:['写景手法：远景近景结合','色彩对比：秋色/落晖的暖色调','用典："采薇"借伯夷叔齐喻归隐'],q:[{t:'(《野望》)"树树皆秋色，山山唯落晖"描绘了怎样的画面？',a:'每棵树都染上秋天的色彩，每一座山都沐浴在落日的余晖中，描绘出秋天傍晚萧瑟静谧的山野景色'}]},
+  14:{b:'崔颢登上黄鹤楼触景生情，吊古怀乡之作。前四句写仙人已去、黄鹤不返的渺茫，后四句写眼前景物引发的乡愁。被严羽《沧浪诗话》推为唐人七律之首。',k:['虚实结合：仙人的传说vs眼前的景物','由景入情：晴川→芳草→日暮→乡关','名句赏析："昔人已乘黄鹤去"的历史感'],q:[{t:'(《黄鹤楼》)"日暮乡关何处是？烟波江上使人愁"表达了什么情感？',a:'日暮时分眺望远方不知何处是家乡，江上烟波浩渺更添愁思，表达了深切的思乡之情'},{t:'(《黄鹤楼》)李白"眼前有景道不得，崔颢题诗在上头"说明此诗有何特点？',a:'说明崔颢此诗艺术成就极高，李白自叹不如，侧面烘托了《黄鹤楼》的千古绝唱地位'}]},
+  15:{b:'737年王维出使凉州途中所作。"大漠孤烟直，长河落日圆"被王国维誉为"千古壮观"的名句，以"直"和"圆"二字写出塞外沙漠的苍茫壮阔。',k:['写景特色：大漠/孤烟/长河/落日组成雄浑画面','炼字赏析："直"显劲拔坚毅，"圆"显温暖苍茫','诗中有画：王维山水画论在诗歌中的体现'],q:[{t:'(《使至塞上》)"大漠孤烟直，长河落日圆"中"直"和"圆"妙在何处？',a:'"直"写出烽烟的劲拔坚毅，"圆"写落日的苍茫温暖，两字勾勒出塞外沙漠雄浑壮阔的奇景'}]},
+  16:{b:'李白出蜀后所作，写沿途所见壮丽景色。"山随平野尽，江入大荒流"以动写静，表现楚地平原的开阔和长江的奔腾。末句"仍怜故乡水"流露对故乡的留恋。',k:['炼字精妙："随""入"以动写静','意象对比：山尽/平野/江入/大荒的空间感','情感转折：前四句豪迈奔放→后四句思乡之情'],q:[{t:'(《渡荆门送别》)"山随平野尽，江入大荒流"中"随"字妙在何处？',a:'"随"字化静为动，写出群山随着平原的出现而消失的动态过程，表现了楚地平原的辽阔'}]},
+  17:{b:'白居易任杭州刺史时所作，紧扣"早春"特点，"争暖树""啄春泥""没马蹄"写出了初春万物复苏的动态美感。',k:['紧扣早春：早莺/新燕/浅草/乱花','炼字精妙："争""啄""没"写出动态美','移步换景：从湖东到白沙堤的游踪'],q:[{t:'(《钱塘湖春行》)白居易是如何抓住"早春"特征描写的？',a:'通过"早莺争暖树""新燕啄春泥""浅草没马蹄"等细节，抓住早春特有景物，写出生机盎然的初春景象'}]},
+  18:{b:'陶渊明辞官归隐后的代表作，表达远离世俗名利后的恬淡心境。"采菊东篱下，悠然见南山"将田园生活与自然融为一体，达到物我两忘的化境。"此中有真意，欲辨已忘言"更是道出了返璞归真的最高境界。',k:['无我之境："采菊东篱下，悠然见南山"的物我两忘','对比手法：人境车马喧vs心远地偏','名句赏析："此中有真意，欲辨已忘言"的哲思'],q:[{t:'(《饮酒》)"采菊东篱下，悠然见南山"中"见"字为什么用得好？',a:'"见"字写出无意中看见南山的悠然情态，物我两忘、天人合一，若用"望"则失之刻意'},{t:'(《饮酒》)"问君何能尔？心远地自偏"揭示了什么哲理？',a:'只要内心远离世俗名利，即使身处闹市也如同居于偏僻之地，强调精神自由高于环境束缚'}]},
+  19:{b:'安史之乱中杜甫被困长安时所作。"感时花溅泪，恨别鸟惊心"以花鸟拟人，写战乱中的忧国思家之情。"烽火连三月，家书抵万金"成为千古传诵的名句。',k:['拟人手法：花溅泪、鸟惊心的移情作用','结构特点：前四句写景→后四句抒情','名句赏析："家书抵万金"的战乱感悟'],q:[{t:'(《春望》)"感时花溅泪，恨别鸟惊心"用了什么修辞？',a:'拟人(移情)。花本无泪、鸟本无心，作者将忧国思家的情感投射到花鸟上，表达极度悲痛的心情'},{t:'(《春望》)"白头搔更短，浑欲不胜簪"反映了什么？',a:'通过搔头使白发更短、连簪子都插不住这一细节，极写忧愁之深、衰老之快，以小见大表现忧国情怀'}]},
+  20:{b:'李贺以奇诡的想象和浓重的色彩描写了边城将士誓死报国的决心。"黑云压城城欲摧"以乌云比喻敌军压境的危急形势，"报君黄金台上意，提携玉龙为君死"抒写将士报国的壮志。',k:['色彩运用：黑云/金鳞/燕脂/红旗/霜重的色彩对比','奇诡想象："黑云压城"的比喻','用典："黄金台"借燕昭王招贤典故'],q:[{t:'(《雁门太守行》)"黑云压城城欲摧"用了什么修辞手法？',a:'比喻+夸张。以"黑云压城"比喻敌军兵临城下的危急形势，"欲摧"夸张地写出形势的危急'},{t:'(《雁门太守行》)李贺这首诗在艺术上有什么特色？',a:'色彩浓烈(黑/金/紫/红)、想象奇诡(黑云压城/燕脂凝夜)、意象密集，具有强烈的视觉冲击力'}]},
+  21:{b:'李清照南渡前的豪放之作。以梦境入笔，写天帝与词人的对话，表达对理想境界的追求。"九万里风鹏正举"化用庄子《逍遥游》，展现昂扬向上的精神。',k:['浪漫主义：梦境与天帝对话的瑰丽想象','用典："九万里风鹏"化用<逍遥游>','风格转变：李清照词中少见的豪放之作'],q:[{t:'(《渔家傲》)"九万里风鹏正举"化用了哪篇文章的典故？',a:'化用<庄子·逍遥游》"鹏之徙于南冥也，水击三千里，抟扶摇而上者九万里"，表达追求理想的豪情'},{t:'(《渔家傲》)这首词在李清照作品中有什么特殊地位？',a:'不同于李清照婉约为主的词风，此词以梦境展开浪漫想象，气势恢宏，是李清照豪放词风的代表作'}]}
+};
+
+CD.essayDetail = {
+  1:{b:'陶渊明虚构了一个与世隔绝的理想社会，表达了对和平安宁、人人平等的理想生活的向往。文章以渔人进出桃花源为线索，虚实结合，引人入胜。',k:['重要实词：交通(交错相通)、妻子(妻儿)、绝境(隔绝之地)、无论(更不必说)、鲜美(鲜艳美丽)','通假字：要→邀','古今异义：交通/妻子/绝境/无论/鲜美'],q:[{t:'("率妻子邑人来此绝境"中"妻子"和"绝境"的古义是？',a:'妻子：妻子和儿女(今：配偶)；绝境：与世隔绝的地方(今：绝路)'},{t:'(《桃花源记》)作者为什么要写这个理想社会？',a:'表达对和平安宁、人人平等的美好生活的向往，以及对战乱现实的批判和不满'}]},
+  2:{b:'柳宗元被贬永州后所作"永州八记"之一。以移步换景手法，按发现小石潭→潭中景物→小潭源流→潭中气氛的顺序描写。看似写景，实则借景抒情，以幽静冷寂的环境表达被贬后的孤寂悲凉。',k:['重要实词：篁竹(竹林)、清冽(清凉)、坻(水中高地)、嵁(不平岩石)、翕忽(轻快敏捷)','特殊句式："全石以为底"(倒装)、"如鸣珮环"(状语后置)','写作手法：移步换景、动静结合、借景抒情'],q:[{t:'(《小石潭记》)"潭中鱼可百许头，皆若空游无所依"用了什么手法？',a:'侧面描写。以鱼的"空游"侧面写水的清澈透明，动静结合表现小石潭的生机'},{t:'(《小石潭记》)作者离开小石潭的原因是"不可久居"，为什么？',a:'因为小石潭过于幽静冷寂的环境"凄神寒骨"，触发了作者被贬后的孤寂悲凉心情，所以不愿久留'}]},
+  3:{b:'魏学洢以一枚桃核为描写对象，通过细腻的笔触展现了微雕艺术的精湛。全文以"总分总"结构组织，先总写核舟大小，再分写船舱、船头、船尾、船背，最后总赞王叔远的技艺。',k:['说明顺序：从整体到局部(船舱→船头→船尾→船背)','详略得当：船头苏轼等三人为重点描写','用词精准："峨冠而多髯""袒胸露乳"等细节传神'],q:[{t:'(《核舟记》)作者写核舟为什么重点描写苏轼等人？',a:'核舟雕刻的主题是"大苏泛赤壁"，苏轼是核心人物，重点写苏轼三人突出了主题，也体现雕刻者的匠心'}]},
+  4:{b:'韩愈借千里马不遇伯乐，表达了自己怀才不遇的愤懑，同时也是对统治者埋没人才的讽刺。全文以"世有伯乐，然后有千里马"为论点展开论述。',k:['通假字：食→饲、见→现、材→才、邪→耶','一词多义：策(鞭打/马鞭)、食(吃/喂养)','论证方法：比喻论证、对比论证'],q:[{t:'(《马说》)食马者"不知马"的具体表现是什么？',a:'策之不以其道(鞭打方式不对)、食之不能尽其材(喂养不当)、鸣之而不能通其意(不通晓马的意思)'},{t:'(《马说》)本文的主旨是什么？',a:'借千里马不遇伯乐，讽刺统治者埋没人才，表达作者怀才不遇的愤懑'}]},
+  5:{b:'庄子《逍遥游》的开篇，以夸张的笔法描绘了鲲化为鹏的宏大景象。"水击三千里，抟扶摇而上者九万里"展现了庄子汪洋恣肆的想象力和对精神自由的追求。',k:['夸张手法：三千里/九万里的极大数字','对比：鲲之大/鹏之飞的宏大境界','主旨：追求绝对的精神自由'],q:[{t:'(《北冥有鱼》)"鹏之徙于南冥也，水击三千里，抟扶摇而上者九万里"用了什么修辞？',a:'夸张。以"三千里""九万里"极写鲲鹏的宏大，展现庄子瑰丽的想象力'}]},
+  6:{b:'《礼记》中的一篇短论，以"虽有嘉肴"为喻，引出"教学相长"的观点。强调实践和学习的重要性，"学然后知不足，教然后知困"揭示了学习和教学的辩证关系。',k:['比喻论证：以嘉肴弗食比喻至道弗学','核心观点：教学相长(教与学互相促进)','逻辑结构：类比→推理→结论'],q:[{t:'(《虽有嘉肴》)"教学相长"是什么意思？',a:'教和学互相促进。学然后知不足，教然后知困，知不足和知困后能自我反思和勉励，从而共同进步'}]},
+  7:{b:'《礼记》中描绘的理想社会蓝图。"天下为公"是大同社会的核心原则，"选贤与能，讲信修睦"是治理方针，"老有所终，壮有所用，幼有所长"是社会保障的理想状态。',k:['核心概念："天下为公"的治国理念','三层结构：总纲→具体制度→社会理想','与现实对比：与"天下为家"的小康社会对比'],q:[{t:'(《大道之行也》)"大道之行也，天下为公"中的"大道"指什么？',a:'指儒家推崇的"大同"社会的政治理想，即以天下为公共的，选贤任能，讲求诚信，和睦相处'}]},
+  8:{b:'陶弘景写给谢中书的书信，以清丽的笔触描绘了江南山水的四季美景。"晓雾将歇，猿鸟乱鸣；夕日欲颓，沉鳞竞跃"以动写静，展现山川的生机与活力。',k:['结构：总分总(总赞→四季分写→总结)','视听结合：晓雾/猿鸟(听觉)/夕日/沉鳞(视觉)','用词精妙："乱""竞"赋予景物动态'],q:[{t:'(《答谢中书书》)"晓雾将歇，猿鸟乱鸣；夕日欲颓，沉鳞竞跃"运用了什么手法？',a:'动静结合。猿鸟乱鸣写声音的动，沉鳞竞跃写画面的动，以动衬静，展现山川的自然生机'}]}
+};
+
+// 加载/保存学习状态
+function cload(){try{return JSON.parse(localStorage.getItem('km_cd')||'{}')}catch(e){return{}}}
+function csave(obj){localStorage.setItem('km_cd',JSON.stringify(obj))}
+
+// 获取掌握状态综合
+function cgetStats(){
+  const o=cload();
+  // 统计诗词
+  let pt=CD.poems.length,pm=0,ps=0,pu=0;
+  CD.poems.forEach(p=>{const st=o['cp_'+p.id]||'unlearned';p.s=st;if(st==='mastered')pm++;else if(st==='studying')ps++;else pu++});
+  // 统计文言文
+  let et=CD.essays.length,em=0,es=0,eu=0;
+  CD.essays.forEach(e=>{const st=o['ce_'+e.id]||'unlearned';e.s=st;if(st==='mastered')em++;else if(st==='studying')es++;else eu++});
+  return {pt,pm,ps,pu,et,em,es,eu};
+}
+
+// 切换状态
+function cts2(type,id){
+  const o=cload();
+  const key='c'+type[0]+'_'+id;
+  const cur=o[key]||'unlearned';
+  const next=cur==='unlearned'?'studying':cur==='studying'?'mastered':'unlearned';
+  o[key]=next;csave(o);
+  // 更新本地S中的语文专题状态同步
+  try{
+    const map={'unlearned':'unlearned','studying':'studying','mastered':'mastered'};
+    // 查找对应专题
+    const s=S.chi;
+  }catch(e){}
+  cldr();
+}
+
+
+// 深度学习详情弹框
+function cdmc(){document.getElementById('dlmo').classList.remove('act');document.body.style.overflow='';}
+function cdts2(type,id,st){
+  const o=cload();const key='c'+type[0]+'_'+id;o[key]=st;csave(o);
+  cdp(type,id);cldr();
+}
+// 点击模态框外部关闭
+document.addEventListener('click',function(e){
+  const mo=document.getElementById('dlmo');
+  if(mo&&mo.classList.contains('act')&&e.target===mo){cdmc()}
+});
+
+
+// 深度学习详情弹框
+function cdp(type,id){
+  const mo=document.getElementById('dlmo');const mc=document.getElementById('dlmc');
+  var item,detail;
+  if(type==='poem'){item=CD.poems.find(p=>p.id===id);detail=CD.poemDetail[id]||{}}
+  else{item=CD.essays.find(e=>e.id===id);detail=CD.essayDetail[id]||{}}
+  _dlNav={type:'cdp',subtype:type,list:type==='poem'?CD.poems:CD.essays,idx:(type==='poem'?CD.poems:CD.essays).findIndex(function(i){return i.id===id})};
+  if(!item)return;
+  const st2=item.s;const lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st2];
+  const cl={mastered:'#4caf50',studying:'#ff9800',unlearned:'#f44336'}[st2];
+  var keys='',exams='';
+  if(detail.k){keys=detail.k.map(k=>'<span class=tg>'+k+'</span>').join('')}
+  if(detail.q){exams=detail.q.map((q,i)=>{const ui='qsa-cd-'+i;return'<div class=dm-q onclick="tq(\''+ui+'\')" style=cursor:pointer><strong>📝 考题'+(i+1)+'：</strong>'+q.t+'<span style=color:var(--text5);font-size:.78em;margin-left:6px>👆点此切换答案</span><div class=qsa id='+ui+'><strong>✅ 答案：</strong>'+q.a+'</div></div>'}).join('')}
+  var html='<div style=display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px><h2 style=margin:0>'+item.t+'</h2><span style=font-size:.85em;padding:3px 14px;border-radius:12px;background:'+cl+'22;color:'+cl+';font-weight:bold>'+lb+'</span></div>';
+  html+='<div class=dm-s>作者：'+item.a+' · '+item.d+'</div>';
+  if(type==='poem'){html+='<h3>📖 原文</h3><div class=dm-b>'+item.c+'</div><div class=dm-t>'+keys+'</div>'}
+  else{html+='<h3>📖 重点句子</h3><div class=dm-b>'+item.k+'</div><div class=dm-t>'+keys+'</div>'}
+  if(detail.b){html+='<h3>🔍 深度解析</h3><div class=dm-s style=line-height:2>'+detail.b+'</div>'}
+  if(exams){html+='<h3>📝 示例考题</h3>'+exams}
+  html+='<div style=margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center>'+
+    '<span style=color:var(--text5);font-size:.85em>更改掌握状态：</span>'+
+    '<span class="ct" style="background:var(--sg-bg);color:var(--sg);padding:8px 20px;border-radius:8px;font-weight:bold;cursor:pointer" onclick="cdts2('+"'"+type+"'"+','+id+','+"'mastered'"+')">✅ 已掌握</span>'+
+    '<span class="ct" style="background:var(--so-bg);color:var(--so);padding:8px 20px;border-radius:8px;font-weight:bold;cursor:pointer" onclick="cdts2('+"'"+type+"'"+','+id+','+"'studying'"+')">📖 学习中</span>'+
+    '<span class="ct" style="background:var(--sr-bg);color:var(--sr);padding:8px 20px;border-radius:8px;font-weight:bold;cursor:pointer" onclick="cdts2('+"'"+type+"'"+','+id+','+"'unlearned'"+')">❌ 未学习</span>'+
+  '</div>';
+  mc.innerHTML=html;mo.classList.add('act');document.body.style.overflow='hidden';
+}
+
+
+// 渲染当前标签
+function cldr(){
+  const sec=document.getElementById('dl_s')?.value||'overview';
+  document.querySelectorAll('.nt').forEach(e=>e.classList.toggle('act',e.dataset.sec===sec));
+  const bd=document.getElementById('dlbd');
+  const st=cgetStats();
+  const o=cload();
+  const isLight=document.documentElement.getAttribute('data-theme')==='light';
+
+  if(sec==='overview')bd.innerHTML=overviewHTML(st,isLight,o);
+  else if(sec==='poems')bd.innerHTML=poemsHTML(st,o);
+  else if(sec==='essays')bd.innerHTML=essaysHTML(st,o);
+  else if(sec==='errors')bd.innerHTML=errorsHTML();
+  else if(sec==='plan')bd.innerHTML=planHTML(st,o);
+  else if(sec==='exam')bd.innerHTML=examHTML();
+
+  // 渲染图表（如果有）
+  if(sec==='overview')setTimeout(()=>{try{
+    const cel=document.getElementById('cdpie');if(!cel||!cel.offsetWidth)return;
+    const ch=echarts.init(cel);const tt=st.pt+st.et;const tm=st.pm+st.em;const ts=st.ps+st.es;const tu=st.pu+st.eu;
+    ch.setOption({tooltip:{trigger:'item',formatter:'{b}:{c}个({d}%)'},
+    color:['#4caf50','#ff9800','#f44336'],series:[{type:'pie',radius:['45%','70%'],center:['50%','55%'],
+    itemStyle:{borderRadius:6,borderColor:isLight?'#fff':'#0a0a1a',borderWidth:2},label:{show:false},
+    data:[{name:'已掌握',value:tm},{name:'学习中',value:ts},{name:'未掌握',value:tu}]}]})
+  }catch(e){}},100);
+}
+
+function overviewHTML(st,isLight,o){
+  const tt=st.pt+st.et;const tm=st.pm+st.em;const ts=st.ps+st.es;const tu=st.pu+st.eu;
+  const mp=tt>0?Math.round(tm/tt*100):0;const sp=tt>0?Math.round(ts/tt*100):0;const up=tt>0?Math.round(tu/tt*100):0;
+  return`<div class=dl-stats>
+    <div class=sc2><div class="n2" style=color:#9c27b0>${st.pt+st.et}</div><div class=l2>总学习项</div></div>
+    <div class=sc2><div class="n2" style=color:#4caf50>${st.pm+st.em}</div><div class=l2>已掌握</div></div>
+    <div class=sc2><div class="n2" style=color:#ff9800>${st.ps+st.es}</div><div class=l2>学习中</div></div>
+    <div class=sc2><div class="n2" style=color:#f44336>${st.pu+st.eu}</div><div class=l2>未学习</div></div>
+    <div class=sc2><div class="n2" style=color:#4caf50>${mp}%</div><div class=l2>总掌握率</div></div>
+  </div>
+  <div class=dl-g dl-g2 style='margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px'>
+    <div class=dl-card><div class=nm>📊 综合掌握分布</div><div class=cb style=height:240px id=cdpie></div></div>
+    <div class=dl-card>
+      <div class=nm>📈 学习进度</div>
+      <div style=margin-top:8px>
+        <div style=margin-bottom:12px><div style=display:flex;justify-content:space-between;font-size:.82em;color:#aaa;margin-bottom:4px><span>古诗词 (${st.pt}首)</span><span>${st.pm}/${st.pt} (${st.pt>0?Math.round(st.pm/st.pt*100):0}%)</span></div>
+        <div class=dl-pb><div class="pf pg" style=width:${st.pt>0?Math.round(st.pm/st.pt*100):0}%></div></div></div>
+        <div><div style=display:flex;justify-content:space-between;font-size:.82em;color:#aaa;margin-bottom:4px><span>文言文 (${st.et}篇)</span><span>${st.em}/${st.et} (${st.et>0?Math.round(st.em/st.et*100):0}%)</span></div>
+        <div class=dl-pb><div class="pf pg" style=width:${st.et>0?Math.round(st.em/st.et*100):0}%></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class=dl-sec><div class=st2><span class=ic>📖</span>每日推荐学习</div>
+  <div class=dl-g dl-g2 style='display:grid;grid-template-columns:1fr 1fr;gap:12px'>
+    ${CD.plans.map(p=>`<div class=dl-card><div class=nm style=color:#4fc3f7>${p.d}</div><div class=ds><span style=color:#ff9800>${p.t}</span> · ${p.c}<br><span style=color:#888;font-size:.8em>方法：${p.m}</span></div></div>`).join('')}
+  </div></div>`;
+}
+
+function poemsHTML(st,o){
+  return`<div class=dl-sec><div class=st2><span class=ic>📝</span>必背古诗词 (21首) <span style=font-size:.75em;color:#888;font-weight:400;margin-left:8px>已掌握${st.pm}/${st.pt}</span></div>
+  <div class=dl-g dl-g2 style='display:grid;grid-template-columns:1fr 1fr;gap:12px'>
+  ${CD.poems.map(p=>{const st2=p.s;const lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st2];return`<div class=dl-card onclick="cdp('poem',${p.id})"><div class=nm>${p.t} <span style=font-size:.75em;color:var(--text5);font-weight:400>${p.a}·${p.d}</span></div>
+  <div class="stg2 ${st2[0]}">${lb}</div>
+  <div class=kp>📖 原文</div><div class=ds style=font-size:.8em;line-height:1.7>${p.c.length>80?p.c.slice(0,80)+'…':p.c}</div>
+  <div class=kp>⚠️ 易错字</div><div class=ds style=font-size:.8em>${p.e}</div>
+  <div class=kp>💡 理解要点</div><div class=ds style=font-size:.8em>${p.m}</div>
+  <div class=cg><span class=ct onclick="event.stopPropagation();cts2('poem',${p.id})">🔄 切换状态</span><span class=ct>👆 点击查看详情</span></div></div>`}).join('')}
+  </div></div>`;
+}
+
+function essaysHTML(st,o){
+  return`<div class=dl-sec><div class=st2><span class=ic>📜</span>必背文言文 (8篇) <span style=font-size:.75em;color:#888;font-weight:400;margin-left:8px>已掌握${st.em}/${st.et}</span></div>
+  <div class=dl-g dl-g2 style='display:grid;grid-template-columns:1fr 1fr;gap:12px'>
+  ${CD.essays.map(e=>{const st2=e.s;const lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st2];return`<div class=dl-card onclick="cdp('essay',${e.id})"><div class=nm>${e.t} <span style=font-size:.75em;color:var(--text5);font-weight:400>${e.a}·${e.d}</span></div>
+  <div class="stg2 ${st2[0]}">${lb}</div>
+  <div class=kp>📖 重点句子</div><div class=ds style=font-size:.8em;line-height:1.7>${e.k}</div>
+  <div class=kp>💡 主旨理解</div><div class=ds style=font-size:.8em>${e.m}</div>
+  <div class=cg><span class=ct onclick="event.stopPropagation();cts2('essay',${e.id})">🔄 切换状态</span><span class=ct>👆 点击查看详情</span></div></div>`}).join('')}
+  </div></div>`;
+}
+
+function errorsHTML(){
+  return`<div class=dl-sec><div class=st2><span class=ic>⚠️</span>易错点总结与解题技巧</div>
+  <table class=dl-tbl><tr><th>易错类型</th><th>具体内容</th><th>解决方法</th></tr>
+  ${CD.errors.map(e=>`<tr><td class=tch>${e.t}</td><td>${e.d}</td><td>${e.m}</td></tr>`).join('')}
+  </table>
+  <div class=dl-sec style=margin-top:24px><div class=st2><span class=ic>💡</span>阅读理解答题模板</div>
+  <div class=dl-g dl-g3 style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px'>
+    <div class=dl-card><div class=nm style=color:#e94560>记叙文</div><div class=ds style=font-size:.82em>概括：时间+地点+人物+事件<br>赏析：修辞/描写+内容+情感<br>环境：渲染气氛+烘托心情+推动情节+暗示主题<br>标题：表层含义+深层含义</div></div>
+    <div class=dl-card><div class=nm style=color:#4fc3f7>说明文</div><div class=ds style=font-size:.82em>方法判断：举例子/列数字/打比方/作比较/分类别/下定义<br>作用模板：xx地说明了……的特点<br>语言：准确严密(限制性词语)</div></div>
+    <div class=dl-card><div class=nm style=color:#ff9800>议论文</div><div class=ds style=font-size:.82em>论点：看标题/开头/结尾<br>论据：事实论据/道理论据<br>论证：举例/道理/对比/比喻<br>结构：引论→本论→结论</div></div>
+  </div></div></div>`;
+}
+
+function planHTML(st,o){
+  // 生成个性化学习计划
+  const ulPoems=CD.poems.filter(p=>p.s==='unlearned');
+  const slPoems=CD.poems.filter(p=>p.s==='studying');
+  const ulEssays=CD.essays.filter(e=>e.s==='unlearned');
+  const slEssays=CD.essays.filter(e=>e.s==='studying');
+  const allTasks=[...ulPoems.map(p=>({id:'cp_'+p.id,name:'📝 背诵《'+p.t+'》',type:'poem',pri:0})),
+    ...slPoems.map(p=>({id:'cp_'+p.id,name:'📝 复习《'+p.t+'》',type:'poem',pri:1})),
+    ...ulEssays.map(e=>({id:'ce_'+e.id,name:'📜 学习《'+e.t+'》',type:'essay',pri:0})),
+    ...slEssays.map(e=>({id:'ce_'+e.id,name:'📜 复习《'+e.t+'》',type:'essay',pri:1}))];
+
+  // 按优先级排序：未学的优先，诗和文交替
+  allTasks.sort((a,b)=>a.pri-b.pri);
+  // 如果超过14天，只显示14天
+  const days=Math.min(allTasks.length,14);
+
+  let planHtml='';
+  for(let d=0;d<days;d++){
+    const t=allTasks[d];
+    const dayStr='第'+(d+1)+'天';
+    const isToday=d===0;
+    const tag=t.type==='poem'?'古诗词':'文言文';
+    planHtml+=`<div class=pl><div class="pln ${isToday?'current':d<days-1?'':'done'}">${d+1}</div>
+    <div class=pld><h4>${dayStr} · ${t.name}</h4><p>${t.pri===0?'⚠️ 未学习·优先安排':'📖 学习中·巩固复习'}</p>
+    <span class=tag2>${tag}</span></div></div>`;
+  }
+
+  const totalTasks=allTasks.length;
+  const doneTasks=0; // 初始状态
+  const remaining=totalTasks;
+
+  return`<div class=dl-sec><div class=st2><span class=ic>🎯</span>个性化学习计划 <span style=font-size:.75em;color:#888;font-weight:400;margin-left:8px>基于当前掌握情况自动生成</span></div>
+  <div class=dl-stats>
+    <div class=sc2><div class="n2" style=color:#ff9800>${totalTasks}</div><div class=l2>待学习任务</div></div>
+    <div class=sc2><div class="n2" style=color:#9c27b0>${days}</div><div class=l2>计划天数</div></div>
+    <div class=sc2><div class="n2" style=color:#4fc3f7>${CD.plans.length}</div><div class=l2>每日时段</div></div>
+  </div>
+  <div class=dl-tl style=margin-bottom:24px><div class=dl-pln>${planHtml}</div>
+  ${allTasks.length>days?`<p style=text-align:center;color:#888;font-size:.82em;margin-top:12px>...还有${allTasks.length-days}项任务将在下一阶段安排</p>`:''}
+  </div>
+  <div class=dl-sec><div class=st2><span class=ic>⏰</span>每日学习时间表</div>
+  <div class=dl-g dl-g2 style='display:grid;grid-template-columns:1fr 1fr;gap:12px'>
+  ${CD.plans.map(p=>`<div class=dl-card><div class=nm style=color:#ff9800>${p.d}</div><div class=ds><strong>时长：</strong>${p.t}<br><strong>内容：</strong>${p.c}<br><span style=color:#888;font-size:.8em>💡 ${p.m}</span></div></div>`).join('')}
+  </div></div>
+  <div class=dl-sec><div class=st2><span class=ic>📅</span>学期/假期学习规划</div>
+  <div class=dl-g dl-g2 style='display:grid;grid-template-columns:1fr 1fr;gap:12px'>
+    <div class=dl-card><div class=nm style=color:#4fc3f7>八年级上学期</div><div class=ds style=font-size:.82em;line-height:1.8>
+    🗓 第1-4周：古诗词10首（每天1首）<br>
+    🗓 第5-8周：文言文4篇（每周1篇）<br>
+    🗓 第9-12周：现代文阅读（每周3篇）<br>
+    🗓 第13-16周：作文训练（每周1篇）<br>
+    🗓 第17-20周：期末复习做真题</div></div>
+    <div class=dl-card><div class=nm style=color:#4fc3f7>八年级下学期</div><div class=ds style=font-size:.82em;line-height:1.8>
+    🗓 第1-4周：古诗词13首（每天1首）<br>
+    🗓 第5-8周：文言文8篇（每周2篇）<br>
+    🗓 第9-12周：现代文阅读（每周3篇）<br>
+    🗓 第13-16周：作文训练（每周1篇）<br>
+    🗓 第17-20周：期末复习做真题</div></div>
+    <div class=dl-card><div class=nm style=color:#ff9800>❄️ 寒假计划</div><div class=ds style=font-size:.82em;line-height:1.8>
+    第1周：古诗词上册10首（每天2首）<br>
+    第2周：古诗词下册13首（每天2首）<br>
+    第3周：文言文上册4篇（每天1篇）<br>
+    第4周：文言文下册8篇（每天2篇）</div></div>
+    <div class=dl-card><div class=nm style=color:#ff9800>☀️ 暑假计划</div><div class=ds style=font-size:.82em;line-height:1.8>
+    第1-2周：古诗词复习（每天5首）<br>
+    第3-4周：文言文复习（每天2篇）<br>
+    第5-6周：现代文阅读（每天1篇）<br>
+    第7-8周：作文训练（每周2篇）</div></div>
+  </div></div>`;
+}
+
+function examHTML(){
+  return`<div class=dl-sec><div class=st2><span class=ic>🎯</span>中考语文试卷结构</div>
+  <table class=dl-tbl><tr><th>题型</th><th>分值</th><th>难度</th><th>备考建议</th></tr>
+  ${CD.exam.map(e=>`<tr><td class=tch>${e.t}</td><td>${e.s}</td><td>${e.l}</td><td>${e.p}</td></tr>`).join('')}
+  </table>
+  <div class=dl-sec style=margin-top:24px><div class=st2><span class=ic>📈</span>中考备考时间表</div>
+  <div class=dl-g dl-g2 style='display:grid;grid-template-columns:1fr 1fr;gap:12px'>
+    <div class=dl-card><div class=nm style=color:#4fc3f7>初三上学期</div><div class=ds>🐾 夯实基础：基础知识+古诗文+文言文，每天练习系统复习</div></div>
+    <div class=dl-card><div class=nm style=color:#ff9800>初三寒假</div><div class=ds>📖 提高阅读：现代文阅读+名著阅读，每天练习总结方法</div></div>
+    <div class=dl-card><div class=nm style=color:#4fc3f7>初三下学期</div><div class=ds>✏️ 写作提升：作文训练+综合复习，每周写作修改完善</div></div>
+    <div class=dl-card><div class=nm style=color:#e94560>中考前1个月</div><div class=ds>🚀 冲刺训练：真题训练+查漏补缺，模拟考试总结经验</div></div>
+  </div></div>
+  <div class=dl-sec style=margin-top:24px><div class=st2><span class=ic>📚</span>学习资源推荐</div>
+  <div class=dl-g dl-g3 style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px'>
+    <div class=dl-card><div class=nm style=color:#e94560>教材教辅</div><div class=ds style=font-size:.82em;line-height:1.8>人教版语文上下册<br>《五年中考三年模拟》<br>《中考语文复习指导》</div></div>
+    <div class=dl-card><div class=nm style=color:#4fc3f7>网络资源</div><div class=ds style=font-size:.82em;line-height:1.8>学而思网校、猿辅导<br>一起作业网、菁优网<br>作文网、素材库</div></div>
+    <div class=dl-card><div class=nm style=color:#ff9800>推荐阅读</div><div class=ds style=font-size:.82em;line-height:1.8>《红星照耀中国》<br>《钢铁是怎样炼成的》<br>《朝花夕拾》《唐诗三百首》</div></div>
+  </div></div>`;
+}
+
+// 设置隐藏select用于跟踪当前tab
+function cld(){
+  const dl=document.getElementById('dl');
+  const act=dl.classList.contains('act');
+  if(act){dl.classList.remove('act');return}
+  // 创建导航
+  const nav=document.getElementById('dlnav');
+  const tabs=[{k:'overview',l:'📊 总览'},{k:'poems',l:'📝 古诗词'},{k:'essays',l:'📜 文言文'},{k:'errors',l:'⚠️ 易错点'},{k:'plan',l:'🎯 学习计划'},{k:'exam',l:'🏆 中考备考'}];
+  // 创建隐藏select用于存储当前tab，同时用div显示标签
+  if(!document.getElementById('dl_s')){
+    const s=document.createElement('input');s.type='hidden';s.id='dl_s';s.value='overview';nav.parentNode.insertBefore(s,nav);
+  }
+  document.getElementById('dl_s').value='overview';
+  nav.innerHTML=tabs.map(t=>`<div class="nt ${t.k==='overview'?' act':''}" data-sec="${t.k}" onclick="document.getElementById('dl_s').value='${t.k}';cldr()">${t.l}</div>`).join('');
+  dl.classList.add('act');
+  document.body.style.overflow='hidden';
+  cldr();
+}
+
+
+  // 深度学习弹框键盘关闭
+  document.addEventListener('keydown',function(e){
+    const mo=document.getElementById('dlmo');
+    if(!mo||!mo.classList.contains('act'))return;
+    if(e.key==='Escape'){cdmc()}
+  });
+
+
+  // 深度学习弹框键盘关闭
+  document.addEventListener('keydown',function(e){
+    const mo=document.getElementById('dlmo');
+    if(!mo||!mo.classList.contains('act'))return;
+    if(e.key==='Escape'){cdmc()}
+  });
+
+// 点击外层关闭
+document.addEventListener('DOMContentLoaded',function(){
+  document.addEventListener('click',function(e){
+    const dl=document.getElementById('dl');
+    if(!dl||!dl.classList.contains('act'))return;
+    if(e.target===dl){dl.classList.remove('act');document.body.style.overflow=''}
+  });
+  // 键盘关闭
+  document.addEventListener('keydown',function(e){
+    const dl=document.getElementById('dl');
+    if(!dl||!dl.classList.contains('act'))return;
+    if(e.key==='Escape'){dl.classList.remove('act');document.body.style.overflow=''}
+  });
+});
+
+
+
+// ====== 生物深度学习数据 ======
+const BD = {
+  sections:[
+    {id:1,t:'生物和生物圈',ex:'生物的七大基本特征：①需要营养②能呼吸③排出废物④对外界刺激反应⑤生长繁殖⑥遗传变异⑦由细胞构成。生态系统＝生产者(植物)＋消费者(动物)＋分解者(菌)＋非生物部分。食物链书写：以生产者为起点，箭头指捕食者，不含分解者。能量流动单向逐级递减，有毒物质沿食物链积累。',k:['七大特征记忆口诀：一团生机长变了(营养/呼吸/废物/刺激/生长/变异/细胞)','食物链书写三规则：从生产者开始，箭头指捕食者，不含分解者','能量传递效率10%-20%，营养级越高生物越少'],q:[{t:'(2025山西)光合作用的场所是？',a:'叶绿体'},{t:'(2024山西)人体最大的消化腺是？',a:'肝脏'}]},
+    {id:2,t:'生物和细胞',ex:'显微镜：放大倍数=目镜×物镜；视野中物像是倒像；玻片移动方向与物像相反。动植物细胞共有的结构：细胞膜/细胞质/细胞核/线粒体；植物特有：细胞壁/叶绿体/液泡。细胞分裂：遗传物质先复制后均分；分化：形成不同组织。',k:['显微镜四步骤：取镜对光→安放装片→调焦→观察','动植物细胞区别：植物有三(壁/泡/叶绿体)动物无','细胞分裂时染色体变化：复制→均分→形成两个子细胞'],q:[{t:'(2025山西)显微镜下物像在右上方，玻片往哪移？',a:'右上方(物像在哪往哪移)'},{t:'植物细胞有而动物细胞没有的结构是？',a:'细胞壁、叶绿体、液泡'}]},
+    {id:3,t:'绿色植物',ex:'光合作用：CO₂+H₂O→有机物+O₂(叶绿体/光)。呼吸作用：有机物+O₂→CO₂+H₂O+能量(线粒体/任何时间)。蒸腾作用：水分散失，促进水和无机盐运输。种子萌发条件：适宜温度＋一定水分＋充足空气。',k:['光合作用与呼吸作用对比表','种子萌发三大条件(水/温/气)缺一不可','蒸腾作用意义：促进水吸收+降温度+运输'],q:[{t:'夜间植物主要进行什么作用？',a:'呼吸作用(光合作用需光，夜间不能进行)'}]},
+    {id:4,t:'人体生理',ex:'血液：血浆(运输)+红细胞(O₂)+白细胞(免疫)+血小板(止血)。血管：动脉(离心快)→毛细血管(交换)→静脉(回心慢)。血液循环：体循环(左心室→全身→右心房)肺循环(右心室→肺→左心房)。尿液形成：肾小球滤过(原尿)→肾小管重吸收(终尿)。反射弧：感受器→传入神经→神经中枢→传出神经→效应器。',k:['动脉血与静脉血区别：含氧量不同','尿液形成两步：滤过+重吸收','反射弧五部分顺序不能颠倒'],q:[{t:'(2024山西)静脉血变动脉血的场所是？',a:'肺部毛细血管(肺循环中气体交换)'},{t:'反射弧的正确顺序是？',a:'感受器→传入神经→神经中枢→传出神经→效应器'}]},
+    {id:5,t:'遗传与变异',ex:'基因是有遗传效应的DNA片段；染色体=DNA+蛋白质；人体23对染色体(22对常染色体+1对性染色体)。显性基因控制显性性状，隐性基因控制隐性性状。男性的精子含X或Y染色体，女性的卵细胞只含X。',k:['染色体/DNA/基因的关系：基因在DNA上，DNA在染色体上','显隐性判断：父母都有某性状，孩子没有→该性状为显性','可遗传变异由遗传物质改变引起'],q:[{t:'男性产生的精子含有的性染色体是？',a:'X或Y(男性XY→两种精子)'},{t:'下列属于可遗传变异的是？',a:'白化病(遗传物质改变)'}]},
+    {id:6,t:'传染病与免疫',ex:'传染病三环节：传染源→传播途径→易感人群。预防措施：控制传染源/切断传播途径/保护易感人群。人体三道防线：皮肤黏膜(一)→杀菌物质(二)→免疫器官和细胞(三)。特异性免疫：产生抗体，只针对特定病原体。',k:['传染病三环节对应三措施','非特异性免疫vs特异性免疫的区别','疫苗属于特异性免疫(注射抗原产生抗体)'],q:[{t:'保护易感人群的措施是？',a:'接种疫苗(提高免疫力)'},{t:'患过天花不再患属于哪种免疫？',a:'特异性免疫(产生了抗体)'}]}
+  ],
+  errors:[
+    {t:'显微镜',d:'物像移动方向、放大倍数与视野大小关系、高倍镜使用顺序',m:'"同向移动"原则(物像在哪玻片往哪移)'},
+    {t:'细胞',d:'误认为洋葱表皮细胞有叶绿体、混淆分裂与分化',m:'洋葱表皮细胞无叶绿体(不见光)'},
+    {t:'生态系统',d:'食物链缺生产者、漏写箭头方向、误含分解者',m:'食物链=生产者→初级→次级消费者'},
+    {t:'人体生理',d:'动脉血≠动脉中的血、原尿与尿液成分混淆',m:'原尿有葡萄糖，尿液无；动脉血含氧多'},
+    {t:'遗传',d:'混淆可遗传与不可遗传变异、性别决定概率',m:'遗传物质改变才可遗传'}
+  ],
+  skills:[{t:'选择题',d:'排除法、关键词法、联想法——先排除再选择'},{t:'识图题',d:'先识别结构名称→联系课本知识→规范准确作答'},{t:'实验探究题',d:'明确实验目的→分析变量→理解原理→控制变量法'},{t:'材料分析题',d:'抓关键词→联系课本→分点作答→用专业术语'}],
+  plan:[{d:'第1天',t:'基础强化',c:'生物圈+细胞+绿色植物',m:'重点复习三大模块概念和对比表'},{d:'第2天',t:'人体生理',c:'循环+呼吸+消化+泌尿',m:'画血液循环图和反射弧图记忆'},{d:'第3天',t:'遗传/传染病',c:'遗传变异+传染病免疫',m:'结合真题练习，查漏补缺'}]
+};
+
+// ====== 地理深度学习数据 ======
+const GD = {
+  sections:[
+    {id:1,t:'地球与地图',ex:'经纬度：纬线(东西向/赤道最长)、经线(南北向/等长)。自转(自西向东/24h)→昼夜交替；公转(1年)→四季。比例尺＝图上距离/实地距离。等高线：向高处凸→山谷；向低处凸→山脊；密集→坡陡。',k:['东西半球分界线：20°W和160°E','自转公转对比表(方向/周期/现象)','等高线判读口诀：凸高为谷，凸低为脊'],q:[{t:'(2024山西)东西半球分界线是？',a:'20°W和160°E'},{t:'昼夜交替的根本原因是？',a:'地球自转'}]},
+    {id:2,t:'世界地理',ex:'七大洲面积：亚非北南美、南极欧(亚洲最大大洋洲最小)。四大洋：太平洋最大、北冰洋最小。世界气候：热带雨林/草原/沙漠/地中海/温带海洋/大陆/季风/苔原/冰原等。人口增长＝出生率－死亡率。',k:['七大洲面积记忆口诀：亚非北南美，南极欧大洋','大洲分界线(亚欧：乌拉尔；亚非：苏伊士)','气候判断：以温定带，以水定型'],q:[{t:'使用人数最多的语言是？',a:'汉语'},{t:'(2024山西)雨热不同期的气候是？',a:'地中海气候'}]},
+    {id:3,t:'中国地理',ex:'领土960万km²(世界第三)；34个省级行政区。地势西高东低三级阶梯；气候复杂多样季风显著；秦岭-淮河是1月0℃等温线/800mm年降水线/亚热带与暖温带分界线。长江最长最大流量，黄河含沙量大有地上河。四大地理区域：北方/南方/西北/青藏。',k:['秦岭-淮河的五条地理分界线意义','长江与黄河对比表(发源/注入/特征)','四大地理区域划分及特征'],q:[{t:'(2024山西)中国地势特点是？',a:'西高东低三级阶梯'},{t:'(2025山西)长江注入哪个海？',a:'东海'}]},
+    {id:4,t:'重要国家与地区',ex:'日本：岛国多火山地震(板块交界)；加工贸易型经济。印度：人口第二；热带季风气候；服务外包产业。俄罗斯：面积最大；重工业发达。美国：农业机械化+硅谷高新技术。巴西：热带雨林；足球王国。澳大利亚：独占大陆；特有动物。',k:['各国特征一表记(日本→地震/印度→季风/俄罗斯→重工)','美国农业带分布特征','澳大利亚特有动物成因(大陆孤立演化)'],q:[{t:'日本多火山地震的原因？',a:'位于太平洋板块与亚欧板块交界处'}]}
+  ],
+  errors:[
+    {t:'经纬网',d:'东西经和南北纬混淆、东西半球分界线记错',m:'20°W向东到160°E为东半球'},
+    {t:'气候',d:'气候类型判断错误、地中海气候位置记混',m:'以温定带(气温看纬度)，以水定型(降水看季节)'},
+    {t:'中国地理',d:'秦岭-淮河分界线记不全、长江黄河混淆',m:'秦岭-淮河=五线合一(气温/降水/温度带/干湿/农业)'},
+    {t:'区域比较',d:'四大地理区域特征混淆、西北与青藏混淆',m:'西北=干旱，青藏=高寒'}
+  ],
+  skills:[{t:'经纬网定位',d:'先看度数变化方向→确定南北纬/东西经→读坐标'},{t:'等高线判读',d:'凸高为谷，凸低为脊；密陡疏缓'},{t:'气候类型判断',d:'以温定带+以水定型=两步法'},{t:'区域比较',d:'用表格对比两区域的异同点'}],
+  plan:[{d:'第1天',t:'地球与地图+世界地理',c:'经纬网/地球运动/气候类型/大洲大洋',m:'画世界地图标注经纬线和大洲'},{d:'第2天',t:'中国地理',c:'疆域/地势/气候/河流/四大区域',m:'画中国轮廓图标注地理分界线'},{d:'第3天',t:'重要国家+真题冲刺',c:'六大国特征+山西乡土地理',m:'做真题，查漏补缺'}]
+};
+
+// ====== 生物实验深度学习数据 ======
+const EXP = {
+  exams:[
+    {id:1,t:'制作并观察洋葱鳞片叶内表皮细胞临时装片',s:'10分',st:'unlearned',p:'学会制作植物细胞临时装片，使用显微镜观察植物细胞，识别细胞壁/细胞膜/细胞质/细胞核/液泡等结构',m:'洋葱鳞片叶、清水、碘液、载玻片、盖玻片、显微镜、镊子、滴管、吸水纸',
+     c:[{n:'擦',d:'用洁净纱布擦拭载玻片和盖玻片(轻拿轻放)'},{n:'滴',d:'在载玻片中央滴一滴清水(水滴不宜过多或过少)'},{n:'撕',d:'用镊子撕取洋葱鳞片叶内表皮(要薄而透明，避免带叶肉)'},{n:'展',d:'将表皮浸入水滴中，用镊子展平(避免折叠)'},{n:'盖',d:'用镊子夹起盖玻片使其一边先接触水滴然后缓缓放下(防气泡)'},{n:'染',d:'在盖玻片一侧滴一滴碘液，另一侧用吸水纸吸引(使染液浸润标本)'},{n:'观',d:'先用低倍镜找到物像再换高倍镜观察'}],
+     k:['最常考实验(必练)','气泡与细胞的区别：气泡边缘黑厚中间空白','染色用碘液不能用红墨水，盖玻片一侧滴另一侧吸','观察到的细胞结构：细胞壁/细胞膜/细胞质/细胞核/液泡'],
+     q:[{t:'制作洋葱内表皮临时装片时，盖盖玻片的正确方法？',a:'用镊子夹起盖玻片，使其一边先接触水滴，然后缓缓放下(防气泡)'},{t:'染色时碘液滴在盖玻片哪一侧？',a:'一侧滴加，另一侧用吸水纸吸引(使染液均匀浸润标本)'}]},
+    {id:2,t:'观察动物的肌肉组织',s:'10分',st:'unlearned',p:'学会使用显微镜观察动物组织，识别肌肉组织的结构特点，理解其功能',m:'肌肉组织永久装片、显微镜',
+     c:[{n:'取镜安放',d:'右手握镜臂左手托镜座，将显微镜放在实验台距边缘约7厘米处'},{n:'对光',d:'转动转换器使低倍物镜对准通光孔；调节遮光器和反光镜使视野明亮'},{n:'安放装片',d:'将装片放在载物台上用压片夹压住，标本正对通光孔中心'},{n:'调焦',d:'眼睛从侧面注视物镜转动粗准焦螺旋使镜筒下降至接近装片；左眼看目镜反方向转动粗准焦螺旋使镜筒上升直到看清物像'},{n:'观察',d:'微调细准焦螺旋使物像更清晰，找到典型的肌纤维'},{n:'整理',d:'实验结束后将显微镜复原，物镜偏到两旁，镜筒下降至最低'}],
+     k:['重点观察：肌纤维呈长圆柱状、有横纹、多个细胞核','永久切片直接观察无需制作','三种肌肉组织：骨骼肌(有横纹多核)/心肌(有分支)/平滑肌(无横纹梭形)'],
+     q:[{t:'骨骼肌细胞在显微镜下的特点？',a:'长圆柱状，有明暗相间的横纹，多个细胞核位于细胞边缘'},{t:'三种肌肉组织的区别？',a:'骨骼肌有横纹多核；心肌有分支；平滑肌无横纹梭形'}]},
+    {id:3,t:'观察种子的结构',s:'10分',st:'unlearned',p:'学会解剖和观察种子结构，区分单子叶和双子叶植物种子',m:'菜豆种子、玉米种子、放大镜、解剖刀、镊子、碘液',
+     c:[{n:'浸软',d:'将菜豆和玉米种子浸泡在水中软化(浸泡时间适中)'},{n:'观察外形',d:'观察种子的外形，识别种皮的颜色和质地'},{n:'菜豆剥皮',d:'用镊子剥去菜豆种皮，分开两片子叶'},{n:'菜豆观察',d:'用放大镜观察胚的结构：胚芽/胚轴/胚根/子叶(两片肥厚)'},{n:'玉米纵切',d:'用解剖刀沿中线纵切玉米种子(切面要平整)'},{n:'玉米染色',d:'在玉米切面上滴碘液(胚乳变蓝，含淀粉)'},{n:'比较记录',d:'比较菜豆和玉米种子结构的异同，绘制结构图'}],
+     k:['菜豆(双子叶)：两片子叶无胚乳；玉米(单子叶)：一片子叶有胚乳','碘液使淀粉变蓝证明胚乳含淀粉','胚的结构=胚芽+胚轴+胚根+子叶'],
+     q:[{t:'菜豆种子和玉米种子的主要区别？',a:'菜豆有两片子叶无胚乳；玉米有一片子叶有胚乳(含淀粉遇碘变蓝)'},{t:'玉米种子纵切后滴碘液哪部分变蓝？',a:'胚乳(含淀粉，遇碘变蓝色)'}]},
+    {id:4,t:'观察人血的永久涂片',s:'10分',st:'unlearned',p:'学会使用显微镜观察血细胞，识别红细胞和白细胞的形态结构',m:'人血永久涂片、显微镜',
+     c:[{n:'取镜安放',d:'将显微镜放在实验台上轻拿轻放'},{n:'对光',d:'调节显微镜使视野明亮'},{n:'安放涂片',d:'将血涂片放在载物台上，标本正对通光孔中心'},{n:'低倍观察',d:'先用低倍镜找到血细胞(数目最多的红细胞)'},{n:'高倍观察',d:'换高倍镜仔细观察红细胞和白细胞的形态差异'},{n:'识别',d:'识别红细胞(两面凹圆饼状无核最多红色)/白细胞(最大有核最少)/血小板(最小不规则)'},{n:'整理',d:'实验结束后整理实验台，显微镜复原'}],
+     k:['红细胞最多两面凹圆饼状无细胞核，功能：运输氧气','白细胞最少最大有细胞核，功能：吞噬病菌防御疾病','血小板最小形状不规则，功能：止血和加速凝血'],
+     q:[{t:'人血涂片中最多和最少的细胞分别是什么？',a:'最多的是红细胞(两面凹圆饼状无核)，最少的是白细胞(有细胞核最大)'},{t:'红细胞的功能是什么？',a:'运输氧气(成熟红细胞无细胞核，含血红蛋白)'}]},
+    {id:5,t:'观察叶片横切面永久切片',s:'10分',st:'unlearned',p:'学会使用显微镜观察叶片结构，识别表皮/叶肉/叶脉',m:'叶片横切面永久切片、显微镜',
+     c:[{n:'取镜安放',d:'将显微镜放在实验台上轻拿轻放'},{n:'对光',d:'调节显微镜使视野明亮'},{n:'安放切片',d:'将切片放在载物台上，标本正对通光孔中心'},{n:'低倍观察',d:'先用低倍镜观察叶片整体结构'},{n:'高倍观察',d:'换高倍镜分别观察表皮/叶肉/叶脉的细节'},{n:'识别记录',d:'识别上表皮(有角质层)/下表皮(有气孔)/栅栏组织(含叶绿体多)/海绵组织(含叶绿体少)/叶脉(导管+筛管)'},{n:'整理',d:'实验结束后整理实验台，显微镜复原'}],
+     k:['栅栏组织靠近上表皮细胞排列整齐含叶绿体多(光合作用主要场所)','海绵组织靠近下表皮有气孔，含叶绿体少','叶脉：导管运输水和无机盐，筛管运输有机物'],
+     q:[{t:'叶片中栅栏组织和海绵组织的主要区别？',a:'栅栏组织靠近上表皮，细胞排列整齐含叶绿体多；海绵组织靠近下表皮，细胞排列疏松含叶绿体少'}]},
+    {id:6,t:'观察酵母菌',s:'10分',st:'unlearned',p:'学会使用显微镜观察微生物，识别酵母菌的形态结构',m:'酵母菌培养液、显微镜、载玻片、盖玻片、滴管、碘液',
+     c:[{n:'准备',d:'擦拭载玻片和盖玻片轻拿轻放'},{n:'取样',d:'用滴管吸取酵母菌培养液滴一滴在载玻片中央(取样要适量)'},{n:'盖片',d:'用镊子夹起盖玻片使其一边先接触液滴然后缓缓放下(防气泡)'},{n:'染色',d:'在盖玻片一侧滴一滴碘液，另一侧用吸水纸吸引(使染液浸润标本)'},{n:'低倍观察',d:'低倍镜下找到酵母菌'},{n:'高倍观察',d:'换高倍镜观察酵母菌的形态结构'},{n:'识别',d:'识别椭圆形细胞/细胞壁/细胞核/液泡/出芽生殖的芽体'}],
+     k:['酵母菌是单细胞真菌(有真正的细胞核属于真核生物)','出芽生殖是酵母菌特有的繁殖方式','碘液染色后细胞核颜色最深(便于观察)'],
+     q:[{t:'酵母菌的生殖方式是什么？',a:'出芽生殖(在母细胞上长出芽体，芽体长大后脱落形成新个体)'},{t:'酵母菌是真菌还是细菌？',a:'真菌(单细胞真菌，有真正的细胞核)'}]}
+  ],
+  scope:[{t:'取镜安放',d:'右手握镜臂左手托镜座，放在实验台偏左'},{t:'对光',d:'低倍物镜对准通光孔→大光圈→反光镜调出明亮圆形视野'},{t:'安放装片',d:'标本正对通光孔中心，压片夹固定'},{t:'调焦观察',d:'粗准焦螺旋下降镜筒(眼看物镜)→上升找物像→细准焦螺旋调清'},{t:'高倍镜使用',d:'低倍找到目标移到视野中央→转高倍→细准焦螺旋调清'},{t:'整理复原',d:'取下装片→物镜转两侧→镜筒降至最低→放回原位'}],
+  errors:[{t:'临时装片',d:'盖盖玻片方法错→气泡多；染色操作顺序错',m:'一侧接触水滴缓缓放下，防气泡'},{t:'显微镜使用',d:'调焦顺序颠倒；高倍镜直接找物像',m:'低倍找→高倍看'},{t:'实验操作',d:'玉米种子切错方向；血细胞识别混淆',m:'玉米纵切，红细胞最多白细胞最大'}],
+  skills:[{t:'操作要点',d:'每一步都要"口述+操作"争取满分'},{t:'时间分配',d:'准备2min+操作10min+观察记录2min+整理1min'},{t:'得分技巧',d:'①步骤全②操作规范③口述清晰④整理到位'},{t:'易失分点',d:'遗漏步骤、操作不规范、忘记整理仪器'}],
+  plan:[{d:'上午',t:'显微镜+六大实验',c:'显微镜规范+6个实验逐个过',m:'每道实验按评分标准操作一遍'},{d:'下午',t:'易错点+技巧',c:'易错点总结+操作技巧+时间分配',m:'重点复习临时装片和种子结构实验'},{d:'晚上',t:'考前冲刺',c:'复习评分标准和必背口诀',m:'深呼吸放松，早睡早起'}]
+};
+
+// 生物视图加载/保存
+function bdLoad(){try{return JSON.parse(localStorage.getItem('km_bd')||'{}')}catch(e){return{}}}
+function bdSave(o){localStorage.setItem('km_bd',JSON.stringify(o))}
+function bdStats(){const o=bdLoad();let t=BD.sections.length,m=0,s=0,u=0;BD.sections.forEach(e=>{const st=o['bs_'+e.id]||'unlearned';e.s=st;if(st==='mastered')m++;else if(st==='studying')s++;else u++});return{t,m,s,u}}
+function bdSts(type,id){const o=bdLoad();const k='b'+type[0]+'_'+id;const cur=o[k]||'unlearned';o[k]=cur==='unlearned'?'studying':cur==='studying'?'mastered':'unlearned';bdSave(o);bdR();}
+function bdDt(type,id){const item=BD.sections.find(s=>s.id===id);if(!item)return;_dlNav={type:'bdDt',list:BD.sections,idx:BD.sections.findIndex(function(i){return i.id===id})};const o=bdLoad();const st=o['bs_'+id]||'unlearned';const lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st];document.getElementById('dlmc').innerHTML='<h2>'+item.t+'</h2><div class=dm-s style=line-height:2>'+item.ex+'</div><h3>🔑 关键考点</h3>'+item.k.map(k=>'<div class=dm-q><strong>📌</strong>'+k+'</div>').join('')+'<h3>📝 真题演练</h3>'+item.q.map((q,i)=>{const ui='qsa-bd-'+id+'-'+i;return'<div class=dm-q onclick="tq(\''+ui+'\')" style=cursor:pointer><strong>题目：</strong>'+q.t+'<span style=color:var(--text5);font-size:.78em;margin-left:6px>👆点此切换答案</span><div class=qsa id='+ui+'><strong>✅ 答案：</strong>'+q.a+'</div></div>'}).join('')+'<div style=margin-top:16px;display:flex;gap:10px><span class=ct onclick="bdSts(\'s\','+id+')" style="background:var(--sg-bg);color:var(--sg);padding:8px 20px;border-radius:8px;cursor:pointer">✅ 已掌握</span><span class=ct onclick="bdSts(\'s\','+id+')" style="background:var(--so-bg);color:var(--so);padding:8px 20px;border-radius:8px;cursor:pointer">📖 学习中</span><span class=ct onclick="bdSts(\'s\','+id+')" style="background:var(--sr-bg);color:var(--sr);padding:8px 20px;border-radius:8px;cursor:pointer">❌ 未学习</span></div>';document.getElementById('dlmo').classList.add('act');document.body.style.overflow='hidden';}
+
+function bdR(){const sec=document.getElementById('bldl_s')?.value||'overview';document.querySelectorAll('#blnav .nt').forEach(e=>e.classList.toggle('act',e.dataset.sec===sec));const bd=document.getElementById('blbd');const st=bdStats();const o=bdLoad();const isLight=document.documentElement.getAttribute('data-theme')==='light';
+if(sec==='overview'){const mt=st.t,mm=st.m,ms=st.s,mu=st.u,mp=mt>0?Math.round(mm/mt*100):0;bd.innerHTML='<div class=dl-stats><div class=sc2><div class="n2" style=color:#4caf50>'+mt+'</div><div class=l2>总考点</div></div><div class=sc2><div class="n2" style=color:#4caf50>'+mm+'</div><div class=l2>已掌握</div></div><div class=sc2><div class="n2" style=color:#ff9800>'+ms+'</div><div class=l2>学习中</div></div><div class=sc2><div class="n2" style=color:#f44336>'+mu+'</div><div class=l2>未学习</div></div><div class=sc2><div class="n2" style=color:#4caf50>'+mp+'%</div><div class=l2>掌握率</div></div></div><div class=dl-sec><div class=st2><span class=ic>📖</span>六大高频考点</div><div class="dl-g dl-g2" style=display:grid;grid-template-columns:1fr 1fr;gap:12px>'+BD.sections.map(s=>{const st2=o['bs_'+s.id]||'unlearned';const lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st2];return'<div class=dl-card onclick="bdDt(\'s\','+s.id+')"><div class=nm>'+s.t+'</div><div class="stg2 '+st2[0]+'">'+lb+'</div><div class=ds style=font-size:.8em>'+s.ex.slice(0,60)+'…</div><div class=kp>🔑 '+s.k.length+'个关键考点</div><div class=cg><span class=ct>👆 点击查看详情</span></div></div>'}).join('')+'</div></div><div class=dl-sec><div class=st2><span class=ic>⚠️</span>高频易错点</div>'+BD.errors.map(e=>'<div class=mk><span class=ml>'+e.t+'</span>'+e.d+'<br><span style=color:#4caf50>💡 '+e.m+'</span></div>').join('')+'</div><div class=dl-sec><div class=st2><span class=ic>💡</span>答题技巧</div><div class="dl-g dl-g3" style=display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px>'+BD.skills.map(s=>'<div class=dl-card><div class=nm style=color:#4caf50>'+s.t+'</div><div class=ds>'+s.d+'</div></div>').join('')+'</div></div>';}
+else if(sec==='plan'){const ul=BD.sections.filter(s=>o['bs_'+s.id]!=='mastered');bd.innerHTML='<div class=dl-sec><div class=st2><span class=ic>🎯</span>考前3天冲刺计划</div><div class=dl-tl>'+BD.plan.map((p,i)=>{const m=ul.filter(s=>s.t.includes(p.m.slice(0,2))).length;return'<div class=pl><div class="pln '+(i===0?'current':'')+'">'+(i+1)+'</div><div class=pld><h4>'+p.d+' · '+p.t+'</h4><p>'+p.c+'<br><span style=color:#888;font-size:.82em>💡 '+p.m+'</span></p></div></div>'}).join('')+'</div></div><div class=dl-sec><div class=st2><span class=ic>📅</span>考前1天冲刺</div><div class=dl-card><div class=ds style=line-height:2>☀️ 上午：查漏补缺，复习薄弱环节<br>🌤 下午：模拟考试，限时完成一套真题<br>🌙 晚上：放松休息，早睡早起保证状态</div></div></div>';}
+else if(sec==='errors'){bd.innerHTML='<div class=dl-sec><div class=st2><span class=ic>⚠️</span>高频易错点与纠正</div><table class=dl-tbl><tr><th>模块</th><th>易错点</th><th>纠正技巧</th></tr>'+BD.errors.map(e=>'<tr><td class=tch>'+e.t+'</td><td>'+e.d+'</td><td>'+e.m+'</td></tr>').join('')+'</table></div><div class=dl-sec><div class=st2><span class=ic>💡</span>答题技巧总结</div><div class="dl-g dl-g3" style=display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px>'+BD.skills.map(s=>'<div class=dl-card><div class=nm style=color:#4caf50>'+s.t+'</div><div class=ds>'+s.d+'</div></div>').join('')+'</div></div></div>';}
+
+else if(sec==='experiment'){var eo=expLoad();bd.innerHTML='<div class=dl-stats><div class=sc2><div class="n2" style=color:#ff5722>'+EXP.exams.length+'</div><div class=l2>总实验数</div></div><div class=sc2><div class="n2" style=color:#4caf50>'+(EXP.exams.filter(function(x){return eo['ex_'+x.id]==='mastered'}).length)+'</div><div class=l2>已掌握</div></div><div class=sc2><div class="n2" style=color:#ff9800>'+(EXP.exams.filter(function(x){return eo['ex_'+x.id]==='studying'}).length)+'</div><div class=l2>学习中</div></div><div class=sc2><div class="n2" style=color:#f44336>'+(EXP.exams.filter(function(x){return !eo['ex_'+x.id]||eo['ex_'+x.id]==='unlearned'}).length)+'</div><div class=l2>未学习</div></div></div><div class=dl-sec><div class=st2><span class=ic>🔬</span>六大实验操作详解</div><div class="dl-g dl-g2" style=display:grid;grid-template-columns:1fr 1fr;gap:12px>'+EXP.exams.map(function(e){var st2=eo['ex_'+e.id]||'unlearned';var lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st2];return'<div class=dl-card onclick="expDt('+e.id+')"><div class=nm>实验'+e.id+'：'+e.t+'</div><div class="stg2 '+st2[0]+'">'+lb+'</div><div class=ds style=font-size:.8em>'+e.p.slice(0,60)+'…</div><div class=kp>分值：'+e.s+' · '+e.c.length+'个步骤</div><div class=cg><span class=ct>👆 点击查看详情</span><span class=ct onclick="expSts('+e.id+');event.stopPropagation();">状态切换</span></div></div>'}).join('')+'</div></div><div class=dl-sec><div class=st2><span class=ic>🔬</span>显微镜使用规范</div><div class="dl-g dl-g2" style=display:grid;grid-template-columns:1fr 1fr;gap:12px>'+EXP.scope.map(function(s){return'<div class=dl-card><div class=nm style=color:#ff5722>'+s.t+'</div><div class=ds>'+s.d+'</div></div>'}).join('')+'</div></div><div class=dl-sec><div class=st2><span class=ic>⚠️</span>实验高频易错点</div>'+EXP.errors.map(function(e){return'<div class=mk><span class=ml>'+e.t+'</span>'+e.d+'<br><span style=color:#4caf50>💡 '+e.m+'</span></div>'}).join('')+'</div>';}
+
+bd.innerHTML+='<div style=text-align:center;margin:24px 0;padding:16px;background:var(--card-bg2);border:1px solid var(--border);border-radius:12px><span style=font-size:1.1em;color:var(--text5)>💪 加油！生物结业考试必过！</span></div>';}
+
+function bld(){const dl=document.getElementById('bldl');if(dl.classList.contains('act')){dl.classList.remove('act');document.body.style.overflow='';return}if(!document.getElementById('bldl_s')){const s=document.createElement('input');s.type='hidden';s.id='bldl_s';s.value='overview';document.getElementById('blnav').parentNode.insertBefore(s,document.getElementById('blnav'))}document.getElementById('bldl_s').value='overview';document.getElementById('blnav').innerHTML=[{k:'overview',l:'📊 总览'},{k:'experiment',l:'🔬 实验'},{k:'plan',l:'🎯 冲刺计划'},{k:'errors',l:'⚠️ 易错点'}].map(t=>'<div class="nt'+(t.k==='overview'?' act':'')+'" data-sec="'+t.k+'" onclick="document.getElementById(\'bldl_s\').value=\''+t.k+'\';bdR()">'+t.l+'</div>').join('');dl.classList.add('act');document.body.style.overflow='hidden';bdR()}
+function bldc(){document.getElementById('bldl').classList.remove('act');document.body.style.overflow=''}
+
+// 地理视图加载/保存
+function gdLoad(){try{return JSON.parse(localStorage.getItem('km_gd')||'{}')}catch(e){return{}}}
+function gdSave(o){localStorage.setItem('km_gd',JSON.stringify(o))}
+function gdStats(){const o=gdLoad();let t=GD.sections.length,m=0,s=0,u=0;GD.sections.forEach(e=>{const st=o['gs_'+e.id]||'unlearned';e.s=st;if(st==='mastered')m++;else if(st==='studying')s++;else u++});return{t,m,s,u}}
+function gdSts(type,id){const o=gdLoad();const k='g'+type[0]+'_'+id;const cur=o[k]||'unlearned';o[k]=cur==='unlearned'?'studying':cur==='studying'?'mastered':'unlearned';gdSave(o);gdR()}
+function gdDt(type,id){const item=GD.sections.find(s=>s.id===id);if(!item)return;_dlNav={type:'gdDt',list:GD.sections,idx:GD.sections.findIndex(function(i){return i.id===id})};const o=gdLoad();const st=o['gs_'+id]||'unlearned';const lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st];document.getElementById('dlmc').innerHTML='<h2>'+item.t+'</h2><div class=dm-s style=line-height:2>'+item.ex+'</div><h3>🔑 关键考点</h3>'+item.k.map(k=>'<div class=dm-q><strong>📌</strong>'+k+'</div>').join('')+'<h3>📝 真题演练</h3>'+item.q.map((q,i)=>{const ui='qsa-gd-'+id+'-'+i;return'<div class=dm-q onclick="tq(\''+ui+'\')" style=cursor:pointer><strong>题目：</strong>'+q.t+'<span style=color:var(--text5);font-size:.78em;margin-left:6px>👆点此切换答案</span><div class=qsa id='+ui+'><strong>✅ 答案：</strong>'+q.a+'</div></div>'}).join('')+'<div style=margin-top:16px;display:flex;gap:10px><span class=ct onclick="gdSts(\'s\','+id+')" style="background:var(--sg-bg);color:var(--sg);padding:8px 20px;border-radius:8px;cursor:pointer">✅ 已掌握</span><span class=ct onclick="gdSts(\'s\','+id+')" style="background:var(--so-bg);color:var(--so);padding:8px 20px;border-radius:8px;cursor:pointer">📖 学习中</span><span class=ct onclick="gdSts(\'s\','+id+')" style="background:var(--sr-bg);color:var(--sr);padding:8px 20px;border-radius:8px;cursor:pointer">❌ 未学习</span></div>';document.getElementById('dlmo').classList.add('act');document.body.style.overflow='hidden';}
+
+function gdR(){const sec=document.getElementById('gldl_s')?.value||'overview';document.querySelectorAll('#glnav .nt').forEach(e=>e.classList.toggle('act',e.dataset.sec===sec));const bd=document.getElementById('glbd');const st=gdStats();const o=gdLoad();
+if(sec==='overview'){const mt=st.t,mm=st.m,ms=st.s,mu=st.u,mp=mt>0?Math.round(mm/mt*100):0;bd.innerHTML='<div class=dl-stats><div class=sc2><div class="n2" style=color:#2196f3>'+mt+'</div><div class=l2>总考点</div></div><div class=sc2><div class="n2" style=color:#4caf50>'+mm+'</div><div class=l2>已掌握</div></div><div class=sc2><div class="n2" style=color:#ff9800>'+ms+'</div><div class=l2>学习中</div></div><div class=sc2><div class="n2" style=color:#f44336>'+mu+'</div><div class=l2>未学习</div></div><div class=sc2><div class="n2" style=color:#4caf50>'+mp+'%</div><div class=l2>掌握率</div></div></div><div class=dl-sec><div class=st2><span class=ic>📖</span>四大核心板块</div><div class="dl-g dl-g2" style=display:grid;grid-template-columns:1fr 1fr;gap:12px>'+GD.sections.map(s=>{const st2=o['gs_'+s.id]||'unlearned';const lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st2];return'<div class=dl-card onclick="gdDt(\'s\','+s.id+')"><div class=nm>'+s.t+'</div><div class="stg2 '+st2[0]+'">'+lb+'</div><div class=ds style=font-size:.8em>'+s.ex.slice(0,60)+'…</div><div class=kp>🔑 '+s.k.length+'个关键考点</div><div class=cg><span class=ct>👆 点击查看详情</span></div></div>'}).join('')+'</div></div><div class=dl-sec><div class=st2><span class=ic>⚠️</span>高频易错点</div>'+GD.errors.map(e=>'<div class=mk><span class=ml>'+e.t+'</span>'+e.d+'<br><span style=color:#4caf50>💡 '+e.m+'</span></div>').join('')+'</div><div class=dl-sec><div class=st2><span class=ic>💡</span>答题技巧</div><div class="dl-g dl-g3" style=display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px>'+GD.skills.map(s=>'<div class=dl-card><div class=nm style=color:#2196f3>'+s.t+'</div><div class=ds>'+s.d+'</div></div>').join('')+'</div></div>';}
+else if(sec==='plan'){bd.innerHTML='<div class=dl-sec><div class=st2><span class=ic>🎯</span>考前3天冲刺计划</div><div class=dl-tl>'+GD.plan.map((p,i)=>'<div class=pl><div class="pln '+(i===0?'current':'')+'">'+(i+1)+'</div><div class=pld><h4>'+p.d+' · '+p.t+'</h4><p>'+p.c+'<br><span style=color:#888;font-size:.82em>💡 '+p.m+'</span></p></div></div>').join('')+'</div></div><div class=dl-sec><div class=st2><span class=ic>📅</span>考前1天冲刺</div><div class=dl-card><div class=ds style=line-height:2>☀️ 上午：查漏补缺，复习薄弱环节<br>🌤 下午：模拟考试，限时完成一套真题<br>🌙 晚上：放松休息，早睡早起保证状态</div></div></div>';}
+else if(sec==='errors'){bd.innerHTML='<div class=dl-sec><div class=st2><span class=ic>⚠️</span>高频易错点与纠正</div><table class=dl-tbl><tr><th>模块</th><th>易错点</th><th>纠正技巧</th></tr>'+GD.errors.map(e=>'<tr><td class=tch>'+e.t+'</td><td>'+e.d+'</td><td>'+e.m+'</td></tr>').join('')+'</table></div><div class=dl-sec><div class=st2><span class=ic>💡</span>答题技巧总结</div><div class="dl-g dl-g3" style=display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px>'+GD.skills.map(s=>'<div class=dl-card><div class=nm style=color:#2196f3>'+s.t+'</div><div class=ds>'+s.d+'</div></div>').join('')+'</div></div></div>';}
+bd.innerHTML+='<div style=text-align:center;margin:24px 0;padding:16px;background:var(--card-bg2);border:1px solid var(--border);border-radius:12px><span style=font-size:1.1em;color:var(--text5)>💪 加油！地理结业考试必过！</span></div>';}
+
+function gld(){const dl=document.getElementById('gldl');if(dl.classList.contains('act')){dl.classList.remove('act');document.body.style.overflow='';return}if(!document.getElementById('gldl_s')){const s=document.createElement('input');s.type='hidden';s.id='gldl_s';s.value='overview';document.getElementById('glnav').parentNode.insertBefore(s,document.getElementById('glnav'))}document.getElementById('gldl_s').value='overview';document.getElementById('glnav').innerHTML=[{k:'overview',l:'📊 总览'},{k:'plan',l:'🎯 冲刺计划'},{k:'errors',l:'⚠️ 易错点'}].map(t=>'<div class="nt'+(t.k==='overview'?' act':'')+'" data-sec="'+t.k+'" onclick="document.getElementById(\'gldl_s\').value=\''+t.k+'\';gdR()">'+t.l+'</div>').join('');dl.classList.add('act');document.body.style.overflow='hidden';gdR()}
+function gldc(){document.getElementById('gldl').classList.remove('act');document.body.style.overflow=''}
+
+// 生物实验视图加载/保存
+function expLoad(){try{return JSON.parse(localStorage.getItem('km_exp')||'{}')}catch(e){return{}}}
+function expSave(o){localStorage.setItem('km_exp',JSON.stringify(o))}
+function expStats(){const o=expLoad();let t=EXP.exams.length,m=0,s=0,u=0;EXP.exams.forEach(e=>{const st=o['ex_'+e.id]||'unlearned';e.s=st;if(st==='mastered')m++;else if(st==='studying')s++;else u++});return{t,m,s,u}}
+function expSts(id){const o=expLoad();const k='ex_'+id;const cur=o[k]||'unlearned';o[k]=cur==='unlearned'?'studying':cur==='studying'?'mastered':'unlearned';expSave(o);expR()}
+function expDt(id){const item=EXP.exams.find(function(e){return e.id===id});if(!item)return;_dlNav={type:'expDt',list:EXP.exams,idx:EXP.exams.findIndex(function(i){return i.id===id})};const o=expLoad();const st=o['ex_'+id]||'unlearned';const lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st];const sc='<div style=background:'+(st==='mastered'?'#4caf50':st==='studying'?'#ff9800':'#f44336')+'22;color:'+(st==='mastered'?'#4caf50':st==='studying'?'#ff9800':'#f44336')+';padding:3px 14px;border-radius:12px;font-size:.85em;font-weight:bold>'+lb+'</div>';const stepsHtml=item.c.map(function(c,i){return'<div class=dm-q><strong style=color:#ff5722>步骤'+(i+1)+'：'+c.n+'</strong><br>'+c.d+'</div>'}).join('');const keyHtml=item.k.map(function(k){return'<div class=dm-q><strong>📌</strong>'+k+'</div>'}).join('');var qHtml='';if(item.q){qHtml='<h3>📝 真题演练</h3>'+item.q.map(function(q,i){return'<div class=dm-q onclick="tq(\'qsa-exp-\'+id+\'-\'+i+\'\')" style=cursor:pointer><strong>题目：</strong>'+q.t+'<span style=color:var(--text5);font-size:.78em;margin-left:6px>👆点此切换答案</span><div class=qsa id="qsa-exp-'+id+'-'+i+'" style=display:block><strong>✅ 答案：</strong>'+q.a+'</div></div>'}).join('')}document.getElementById('dlmc').innerHTML='<div style=display:flex;justify-content:space-between;align-items:flex-start><div><h2 style=margin:0>🔬 实验'+id+'：'+item.t+'</h2><div style=color:var(--text5);font-size:.9em;margin-top:4px>分值：'+item.s+'</div></div>'+sc+'</div><div style=background:var(--card-bg3);border-radius:10px;padding:12px 16px;margin:12px 0;line-height:1.6><strong>🎯 实验目的：</strong>'+item.p+'<br><strong>🧪 实验材料：</strong>'+item.m+'</div><h3>📝 操作步骤</h3>'+stepsHtml+'<h3>🔑 关键知识点</h3>'+keyHtml+qHtml+'<div style=margin-top:16px;display:flex;gap:10px><span class=ct onclick="expSts('+id+')" style="background:var(--sg-bg);color:var(--sg);padding:8px 20px;border-radius:8px;cursor:pointer">✅ 已掌握</span><span class=ct onclick="expSts('+id+')" style="background:var(--so-bg);color:var(--so);padding:8px 20px;border-radius:8px;cursor:pointer">📖 学习中</span><span class=ct onclick="expSts('+id+')" style="background:var(--sr-bg);color:var(--sr);padding:8px 20px;border-radius:8px;cursor:pointer">❌ 未学习</span></div>';document.getElementById('dlmo').classList.add('act');document.body.style.overflow='hidden';}
+
+function expR(){const sec=document.getElementById('expdl_s')?.value||'overview';document.querySelectorAll('#expnav .nt').forEach(e=>e.classList.toggle('act',e.dataset.sec===sec));const bd=document.getElementById('expbd');const st=expStats();const o=expLoad();
+if(sec==='overview'){const mt=st.t,mm=st.m,ms=st.s,mu=st.u;bd.innerHTML='<div class=dl-stats><div class=sc2><div class="n2" style=color:#ff5722>'+mt+'</div><div class=l2>总实验数</div></div><div class=sc2><div class="n2" style=color:#4caf50>'+mm+'</div><div class=l2>已掌握</div></div><div class=sc2><div class="n2" style=color:#ff9800>'+ms+'</div><div class=l2>学习中</div></div><div class=sc2><div class="n2" style=color:#f44336>'+mu+'</div><div class=l2>未学习</div></div></div><div class=dl-sec><div class=st2><span class=ic>🔬</span>六大实验操作详解</div><div class="dl-g dl-g2" style=display:grid;grid-template-columns:1fr 1fr;gap:12px>'+EXP.exams.map(e=>{const st2=o['ex_'+e.id]||'unlearned';const lb={mastered:'已掌握',studying:'学习中',unlearned:'未学习'}[st2];return'<div class=dl-card onclick="expDt('+e.id+')"><div class=nm>实验'+e.id+'：'+e.t+'</div><div class="stg2 '+st2[0]+'">'+lb+'</div><div class=kp>分值：'+e.s+' · '+e.c.length+'个步骤</div><div class=cg><span class=ct>👆 点击查看详情</span></div></div>'}).join('')+'</div></div><div class=dl-sec><div class=st2><span class=ic>🔬</span>显微镜使用规范</div><div class="dl-g dl-g2" style=display:grid;grid-template-columns:1fr 1fr;gap:12px>'+EXP.scope.map(s=>'<div class=dl-card><div class=nm style=color:#ff5722>'+s.t+'</div><div class=ds>'+s.d+'</div></div>').join('')+'</div></div><div class=dl-sec><div class=st2><span class=ic>⚠️</span>高频易错点</div>'+EXP.errors.map(e=>'<div class=mk><span class=ml>'+e.t+'</span>'+e.d+'<br><span style=color:#4caf50>💡 '+e.m+'</span></div>').join('')+'</div>';}
+else if(sec==='plan'){bd.innerHTML='<div class=dl-sec><div class=st2><span class=ic>🎯</span>考前冲刺计划</div><div class=dl-tl>'+EXP.plan.map((p,i)=>'<div class=pl><div class="pln '+(i===0?'current':'')+'">'+(i+1)+'</div><div class=pld><h4>'+p.d+'</h4><p>'+p.t+'<br>'+p.c+'<br><span style=color:#888;font-size:.82em>💡 '+p.m+'</span></p></div></div>').join('')+'</div></div></div>';}
+else if(sec==='skills'){bd.innerHTML='<div class=dl-sec><div class=st2><span class=ic>💡</span>考试技巧与时间分配</div><div class="dl-g dl-g2" style=display:grid;grid-template-columns:1fr 1fr;gap:12px>'+EXP.skills.map(s=>'<div class=dl-card><div class=nm style=color:#ff5722>'+s.t+'</div><div class=ds>'+s.d+'</div></div>').join('')+'</div></div><div class=dl-sec><div class=st2><span class=ic>📝</span>必背口诀</div><div class=dl-card><div class=ds style=font-size:.9em;line-height:2>🔬 显微镜口诀：<br>一取二放三安装，四转低倍五对光<br>六上玻片七下降，八升镜筒细观赏<br>看完低倍转高倍，九退整理十归箱<br><br>🧪 临时装片口诀：<br>擦滴撕展盖染观，七步牢记不颠倒<br>盖片一侧先接触，缓缓放下防气泡<br>染色碘液侧滴加，吸水纸引才有效</div></div></div></div>';}
+bd.innerHTML+='<div style=text-align:center;margin:24px 0;padding:16px;background:var(--card-bg2);border:1px solid var(--border);border-radius:12px><span style=font-size:1.1em;color:var(--text5)>🔬 仔细操作，口述清晰，满分到手！</span></div>';}
+
+function expld(){const dl=document.getElementById('expdl');if(dl.classList.contains('act')){dl.classList.remove('act');document.body.style.overflow='';return}if(!document.getElementById('expdl_s')){const s=document.createElement('input');s.type='hidden';s.id='expdl_s';s.value='overview';document.getElementById('expnav').parentNode.insertBefore(s,document.getElementById('expnav'))}document.getElementById('expdl_s').value='overview';document.getElementById('expnav').innerHTML=[{k:'overview',l:'📊 总览'},{k:'plan',l:'🎯 冲刺'},{k:'skills',l:'💡 技巧'}].map(t=>'<div class="nt'+(t.k==='overview'?' act':'')+'" data-sec="'+t.k+'" onclick="document.getElementById(\'expdl_s\').value=\''+t.k+'\';expR()">'+t.l+'</div>').join('');dl.classList.add('act');document.body.style.overflow='hidden';expR()}
+function expdc(){document.getElementById('expdl').classList.remove('act');document.body.style.overflow='';}
+
+// ====== 弹框导航状态 ======
+var _dlNav={type:'',list:[],idx:0};
+// 调用导航
+function _dlNavPrev(){
+  if(_dlNav.list.length<2)return;
+  _dlNav.idx=(_dlNav.idx-1+_dlNav.list.length)%_dlNav.list.length;
+  var item=_dlNav.list[_dlNav.idx];
+  if(!item)return;
+  var nc=_dlNav;
+  if(nc.type==='cdp'){cdp(nc.subtype||'poem',item.id)}
+  else if(nc.type==='bdDt'){bdDt('s',item.id)}
+  else if(nc.type==='gdDt'){gdDt('s',item.id)}
+  else if(nc.type==='expDt'){expDt(item.id)}
+  else if(nc.type==='maDt'){maDt('s',item.id)}
+  else if(nc.type==='phDt'){phDt('s',item.id)}
+  else if(nc.type==='enDt'){enDt('s',item.id)}
+  else if(nc.type==='hiDt'){hiDt('s',item.id)}
+  else if(nc.type==='poDt'){poDt('s',item.id)}
+  else if(nc.type==='std'){std(nc.subtype,item.id)}
+}
+function _dlNavNext(){
+  if(_dlNav.list.length<2)return;
+  _dlNav.idx=(_dlNav.idx+1)%_dlNav.list.length;
+  var item=_dlNav.list[_dlNav.idx];
+  if(!item)return;
+  var nc=_dlNav;
+  if(nc.type==='cdp'){cdp(nc.subtype||'poem',item.id)}
+  else if(nc.type==='bdDt'){bdDt('s',item.id)}
+  else if(nc.type==='gdDt'){gdDt('s',item.id)}
+  else if(nc.type==='expDt'){expDt(item.id)}
+  else if(nc.type==='maDt'){maDt('s',item.id)}
+  else if(nc.type==='phDt'){phDt('s',item.id)}
+  else if(nc.type==='enDt'){enDt('s',item.id)}
+  else if(nc.type==='hiDt'){hiDt('s',item.id)}
+  else if(nc.type==='poDt'){poDt('s',item.id)}
+  else if(nc.type==='std'){std(nc.subtype,item.id)}
+}
+// 键盘导航
+document.addEventListener('keydown',function(e){
+  var inDlmo=document.getElementById('dlmo').classList.contains('act');
+  var inMol=document.getElementById('mol').classList.contains('act');
+  if(!inDlmo&&!inMol)return;
+  if(e.key==='ArrowLeft'){_dlNavPrev();e.preventDefault()}
+  else if(e.key==='ArrowRight'){_dlNavNext();e.preventDefault()}
+});
+// ====== 冲刺目标数据（增强版） ======
+const GDATA = {
+  scores:{chi:46,eng:63,phy:67,his:62,math:74,pol:76},
+  targets:{chi:80,eng:90,phy:85,his:80,math:95,pol:85},
+  names:{chi:'语文',eng:'英语',phy:'物理',his:'历史',math:'数学',pol:'道法'},
+  icons:{chi:'📚',eng:'🔤',phy:'⚡',his:'📜',math:'🔢',pol:'⚖️'},
+  colors:{chi:'#9c27b0',eng:'#00bcd4',phy:'#f44336',his:'#607d8b',math:'#ff9800',pol:'#e91e63'},
+  examWeight:{chi:120,eng:120,math:120,phy:100,his:75,pol:75},
+  totalCur:592,totalTar:719,totalElite:811,
+  sKey:{chi:'chi',eng:'eng',math:'math',phy:'phy',his:'his',pol:'pol'},
+  schools:[
+    {n:'山大附中',s:811,g:811-592,c:'#e94560',d:'极高',f:'山西省顶尖高中，竞赛保送优势明显'},
+    {n:'太原五中',s:805,g:805-592,c:'#e94560',d:'极高',f:'百年名校，理科竞赛实力强劲'},
+    {n:'省实验',s:801,g:801-592,c:'#f44336',d:'很高',f:'省教育厅直属，文科见长'},
+    {n:'外国语',s:795,g:795-592,c:'#f44336',d:'很高',f:'外语特色，保送生名额多'},
+    {n:'成成中学',s:784,g:784-592,c:'#ff9800',d:'较高',f:'历史悠久，管理严格'},
+    {n:'十二中',s:775,g:775-592,c:'#ff9800',d:'较高',f:'理科优势，师资雄厚'},
+    {n:'十八中',s:762,g:762-592,c:'#4caf50',d:'中等',f:'均衡发展，性价比高'},
+    {n:'实验中学',s:758,g:758-592,c:'#4caf50',d:'中等',f:'艺术体育特色'},
+    {n:'育英中学',s:745,g:745-592,c:'#2196f3',d:'较低',f:'有实验班，适合冲刺'}
+  ],
+  tips:[
+    '📌 山大附中2025年录取线811分，当前总分592分，提升空间+219分',
+    '📌 精力分配算法：提分难度×中考权重×未掌握率，智能分配各科学习时间',
+    '📌 每日计划根据你标记的各专题掌握状态实时调整，未学内容优先安排',
+    '📌 历史、道法为开卷考试，掌握开卷技巧可快速提分',
+    '📌 语文当前46分提升空间最大(+34分)，建议每日优先投入时间'
+  ]
+};
+// 计算各科掌握度（从S数据实时读取）
+function getMasteryStats(){
+  var keys=['chi','eng','math','phy','his','pol'];var result={};
+  keys.forEach(function(k){
+    var s=S[k];var total=s?s.tp.length:0;var m=0,st=0,u=0;
+    if(s){s.tp.forEach(function(t){if(t.st==='mastered')m++;else if(t.st==='studying')st++;else u++})}
+    result[k]={total:total,mastered:m,studying:st,unlearned:u,pct:total>0?Math.round(m/total*100):0}
+  });
+  var allTotal=0,allM=0;keys.forEach(function(k){allTotal+=result[k].total;allM+=result[k].mastered});
+  result._all={total:allTotal,mastered:allM,pct:allTotal>0?Math.round(allM/allTotal*100):0};
+  return result;
+}
+// 计算精力分配
+function calcEffort(){
+  var s=GDATA;var ms=getMasteryStats();var keys=Object.keys(s.scores);
+  var raw={};var total=0;
+  keys.forEach(function(k){
+    var gap=s.targets[k]-s.scores[k];var weight=s.examWeight[k];
+    var unlearnedPct=ms[k].total>0?ms[k].unlearned/ms[k].total:1;
+    var val=Math.max(1,gap/10)*weight/120*(1+unlearnedPct);
+    raw[k]=val;total+=val;
+  });
+  var result={};keys.forEach(function(k){
+    result[k]={score:s.scores[k],target:s.targets[k],gap:s.targets[k]-s.scores[k],weight:s.examWeight[k],mastery:ms[k].pct,unlearned:ms[k].unlearned,totalTp:ms[k].total,effort:Math.round(raw[k]/total*100)};
+  });
+  result._totalEffort=total;return result;
+}
+// 获取每日推荐任务
+function getDayPlan(dayIdx){
+  var s=GDATA;var effort=calcEffort();var keys=Object.keys(s.scores);
+  // 按精力排序
+  keys.sort(function(a,b){return effort[b].effort-effort[a].effort});
+  // 7天循环：前6天按精力分配，第7天综合
+  var plan=[];
+  for(var d=0;d<7;d++){
+    var dayTasks=[];
+    if(d<6){
+      var mainKey=keys[d%keys.length];
+      // 主科目：找到该科目中未掌握或学习中的专题
+      var sub=S[mainKey];var topics=[];
+      if(sub){
+        topics=sub.tp.filter(function(t){return t.st!=='mastered'});
+        topics.sort(function(a,b){return a.st==='unlearned'?-1:1});
+      }
+      var taskCount=Math.min(topics.length,2);
+      for(var i=0;i<taskCount;i++){
+        var t=topics[i];dayTasks.push({subj:mainKey,name:t.t,st:t.st,kp:t.kp.length});
+      }
+      // 如果没有未学专题，加一个已学复习
+      if(taskCount===0&&sub){
+        var mastered=sub.tp.filter(function(t){return t.st==='mastered'});
+        if(mastered.length>0)dayTasks.push({subj:mainKey,name:mastered[0].t,st:'mastered',kp:mastered[0].kp.length});
+      }
+      // 如果任务少于2个，从精力第二的科目补充
+      if(dayTasks.length<2){
+        var secKey=keys[(d+1)%keys.length];
+        if(secKey!==mainKey){
+          var sec=S[secKey];if(sec){
+            var secT=sec.tp.filter(function(t){return t.st!=='mastered'});
+            if(secT.length>0)dayTasks.push({subj:secKey,name:secT[0].t,st:secT[0].st,kp:secT[0].kp.length});
+          }
+        }
+      }
+    }else{
+      // 第7天综合复习：选所有科目中最弱的3个专题
+      keys.forEach(function(k){
+        var sub=S[k];if(!sub)return;
+        var weak=sub.tp.filter(function(t){return t.st!=='mastered'});
+        weak.forEach(function(t){dayTasks.push({subj:k,name:t.t,st:t.st,kp:t.kp.length})});
+      });
+      dayTasks.sort(function(a,b){return a.st==='unlearned'?-1:1});
+      dayTasks=dayTasks.slice(0,4);
+    }
+    plan.push(dayTasks);
+  }
+  return plan;
+}
+function rgoal(){
+  var c=document.getElementById('sarea');
+  c.innerHTML='<div class="pg act" id=c-_goal></div>';
+  var bd=document.getElementById('c-_goal');
+  var s=GDATA;var isTheme=document.documentElement.getAttribute('data-theme')==='light';
+  var totalGap=s.totalElite-s.totalCur;var keys=Object.keys(s.scores);
+  var ms=getMasteryStats();var effort=calcEffort();
+  var pct=ms._all.pct;var eliteCls=s.totalElite>s.totalCur?'re':'gr';
+  // 精力列表
+  var sortedKeys=keys.slice().sort(function(a,k){return effort[k].effort-effort[a].effort});
+  var effortBars=sortedKeys.map(function(k){
+    var e=effort[k];var bc=e.effort>25?'#e94560':e.effort>15?'#ff9800':'#4caf50';
+    return'<div class=er><div class=ed>'+s.icons[k]+' '+s.names[k]+'</div><div class=eb><div class=ef style=width:'+e.effort+'%;background:'+bc+'>'+e.effort+'%</div></div><div class=ep>需提+'+e.gap+'</div></div>'
+  }).join('');
+  // 计划导航+每日内容
+  var dayNames=['周一','周二','周三','周四','周五','周六','周日'];
+  var plan=getDayPlan();
+  var planNav=plan.map(function(tasks,i){
+    return'<div class="pn'+(i===0?' act':'')+'" onclick="switchDay('+i+')">'+dayNames[i]+'</div>'
+  }).join('');
+  var planDays=plan.map(function(tasks,i){
+    var mainSubj=tasks.length>0?tasks[0].subj:'chi';
+    var tagCl=s.colors[mainSubj];var tagTxt=s.names[mainSubj];
+    if(i===6)tagTxt='综合复习';
+    var items=tasks.map(function(t,j){
+      var sts={unlearned:'未学习',studying:'学习中',mastered:'已掌握'};
+      var stc={unlearned:'ul',studying:'sl',mastered:'ml'};
+      return'<div class=pi><div class=pi-n style=background:'+s.colors[t.subj]+'22;color:'+s.colors[t.subj]+'>'+(j+1)+'</div><div class=pi-c><div class=pi-t>'+s.icons[t.subj]+' '+t.name+'</div><div class=pi-d>科目：'+s.names[t.subj]+' · '+t.kp+'个知识点</div></div><div class="pi-st '+stc[t.st]+'">'+sts[t.st]+'</div></div>'
+    }).join('');
+    return'<div class="plan-day'+(i===0?' act':'')+'" id=pd-'+i+'><div class=pd-h><span class=pd-t>'+dayNames[i]+' · 重点科目</span><span class=pd-tg style=background:'+tagCl+'>'+tagTxt+'</span></div><div class=pd-items>'+items+'</div></div>'
+  }).join('');
+  // 各科掌握表
+  var scoreRows=keys.map(function(k){
+    var e=effort[k];var bc=e.effort>25?'#e94560':e.effort>15?'#ff9800':'#4caf50';var pr=Math.round(e.score/e.target*100);
+    return'<tr><td class=tch><span class=gp style=background:'+s.colors[k]+'></span>'+s.icons[k]+' '+s.names[k]+'</td><td style=color:'+s.colors[k]+';font-weight:bold>'+e.score+'</td><td style=color:#4caf50;font-weight:bold>'+e.target+'</td><td style=color:#ff9800;font-weight:bold>+'+(e.target-e.score)+'</td><td style=color:#e94560;font-weight:bold;font-size:.82em>'+e.effort+'%</td><td><div style=display:flex;align-items:center;gap:6px><div class=goal-bar style=flex:1><div class="bf '+(pr>60?'gn':'or')+'" style=width:'+pr+'%></div></div><span style=font-size:.72em;color:var(--text5)>'+pr+'%</span></div></td></tr>'
+  }).join('');
+  // 组装HTML
+  var h='<div class=stats style=grid-template-columns:repeat(auto-fit,minmax(100px,1fr))>';
+  h+='<div class=sc><div class="num re">'+s.totalCur+'</div><div class=lb>当前总分</div></div>';
+  h+='<div class=sc><div class="num gr">'+s.totalTar+'</div><div class=lb>近期目标</div></div>';
+  h+='<div class=sc><div class="num '+eliteCls+'" style=font-size:1.4em>'+s.totalElite+'</div><div class=lb>山大附中</div></div>';
+  h+='<div class=sc><div class="num or">+'+totalGap+'</div><div class=lb>提升空间</div></div>';
+  h+='<div class=sc><div class="num bl">'+pct+'%</div><div class=lb>掌握进度</div></div></div>';
+  h+='<div class=goal-tip>'+s.tips.join('<br>')+'</div>';
+  // 精力分配区块
+  h+='<div class=sec><div class=st><span class=ac>⏳</span>精力分配 <span style=font-size:.7em;color:var(--text5);font-weight:400;margin-left:6px>基于分数差距×中考权重×未掌握率 智能计算</span></div>';
+  h+='<div class=effort-chart><div class=goal-card><h4>⏰ 各科精力占比</h4><div class=gcb id=effortPie></div></div>';
+  h+='<div class=goal-card><h4>📊 分配详情</h4><div class=erg-sc>'+effortBars+'</div><div style=margin-top:10px;padding:8px;background:var(--bg3);border-radius:8px;font-size:.78em;color:var(--text5);line-height:1.7>💡 <b>投入策略</b>：精力占比越高说明该科提分紧迫性越大。<br>语文('+effort.chi.effort+'%)提分空间最大，应每日优先投入。<br>建议精力从高到低依次分配学习时间。</div></div></div></div>';
+  // 动态每日计划
+  h+='<div class=sec><div class=st><span class=ac>📋</span>智能每日计划 <span style=font-size:.7em;color:var(--text5);font-weight:400;margin-left:6px>根据掌握度实时调整，点击标签切换日期</span></div>';
+  h+='<div class=plan-nav id=planNav>'+planNav+'</div>';
+  h+='<div id=planDays>'+planDays+'</div></div>';
+  // 各科提分方案
+  h+='<div class=sec><div class=st><span class=ac>🎯</span>各科提分方案</div>';
+  h+='<table class=goal-tbl><tr><th>科目</th><th>当前</th><th>目标</th><th>需提</th><th>精力占比</th><th>目标进度</th></tr>'+scoreRows;
+  h+='<tr style=background:var(--bg3)><td class=tch style=font-size:1.05em>🎯 总分</td><td style=color:#e94560;font-weight:bold;font-size:1.05em>'+s.totalCur+'</td><td style=color:#4caf50;font-weight:bold;font-size:1.05em>'+s.totalTar+'</td><td style=color:#ff9800;font-weight:bold;font-size:1.05em>'+(s.totalTar-s.totalCur)+'</td><td style=color:var(--text5);font-size:.85em>100%</td><td style=font-size:.85em;color:var(--text5)>掌握率 '+pct+'%</td></tr></table></div>';
+  // 成绩对比+学校图（保持原有图表）
+  h+='<div class=sec><div class=st><span class=ac>📊</span>图表分析</div>';
+  h+='<div class=goal-card><h4>📈 当前成绩 vs 目标成绩 vs 山大附中要求</h4><div class=gcb id=goalChart></div></div>';
+  h+='<div class=goal-card><h4>🏫 太原重点高中录取线对比</h4><div class=gcb id=schoolChart></div></div></div>';
+  bd.innerHTML=h;
+  setTimeout(function(){try{
+    // 精力分配饼图
+    var eel=document.getElementById('effortPie');
+    if(eel&&eel.offsetWidth){
+      var ech=echarts.init(eel);
+      ech.setOption({tooltip:{trigger:'item',formatter:'{b}: {c}%'},series:[{type:'pie',radius:['45%','70%'],center:['50%','55%'],itemStyle:{borderRadius:6,borderColor:isTheme?'#fff':'#0f0f1a',borderWidth:2},label:{show:true,formatter:'{b}\n{d}%',color:isTheme?'#555':'#aaa',fontSize:11},data:keys.map(function(k){return{name:s.names[k],value:effort[k].effort,itemStyle:{color:s.colors[k]}}})}]});
+      window.addEventListener('resize',function(){ech.resize()});}
+    // 成绩对比图
+    var cel=document.getElementById('goalChart');
+    if(cel&&cel.offsetWidth){
+      var ch=echarts.init(cel);
+      ch.setOption({tooltip:{trigger:'axis'},legend:{data:['当前成绩','近期目标','山大附中要求'],textStyle:{color:isTheme?'#666':'#aaa'},top:0},grid:{left:40,right:20,bottom:40,top:40},xAxis:{type:'category',data:keys.map(function(k){return s.names[k]}),axisLabel:{color:isTheme?'#666':'#aaa'}},yAxis:{type:'value',max:100,axisLabel:{color:isTheme?'#666':'#aaa'}},series:[{name:'当前成绩',type:'bar',data:keys.map(function(k){return s.scores[k]}),itemStyle:{borderRadius:[6,6,0,0],color:['#f44336','#ff9800','#ff9800','#607d8b','#ff9800','#e91e63']}},{name:'近期目标',type:'bar',data:keys.map(function(k){return s.targets[k]}),itemStyle:{borderRadius:[6,6,0,0],color:['#9c27b0','#00bcd4','#f44336','#607d8b','#ff9800','#e91e63']}},{name:'山大附中要求',type:'line',data:[95,95,95,95,95,95],lineStyle:{color:'#e94560',width:2,type:'dashed'},symbol:'none'}]});
+      window.addEventListener('resize',function(){ch.resize()});}
+    // 学校对比图
+    var sel=document.getElementById('schoolChart');
+    if(sel&&sel.offsetWidth){
+      var sh=echarts.init(sel);
+      sh.setOption({tooltip:{trigger:'axis',formatter:function(p){var r='<b>'+p[0].name+'</b><br/>录取线: '+p[0].value+'分<br/>差距: +'+(p[0].value-592)+'分<br/>难度: '+s.schools[p[0].dataIndex].d;return r}},grid:{left:60,right:50,bottom:40,top:20},xAxis:{type:'category',data:s.schools.map(function(sc){return sc.n}),axisLabel:{rotate:30,color:isTheme?'#666':'#aaa',fontSize:10}},yAxis:{type:'value',min:700,max:830,axisLabel:{color:isTheme?'#666':'#aaa'}},series:[{type:'bar',data:s.schools.map(function(sc){return{value:sc.s,itemStyle:{color:sc.c,borderRadius:[6,6,0,0]}}}),barWidth:24,label:{show:true,position:'top',formatter:'{c}',color:isTheme?'#666':'#aaa',fontSize:10}},{type:'line',data:s.schools.map(function(){return 592}),lineStyle:{color:'#ff9800',width:2,type:'dashed'},symbol:'none',label:{show:true,formatter:'当前'+592+'分',color:'#ff9800',fontSize:10,position:'end'}}]});
+      window.addEventListener('resize',function(){sh.resize()});}
+  }catch(e){}},200);
+}
+// 计划标签切换
+function switchDay(i){
+  document.querySelectorAll('#planNav .pn').forEach(function(e,j){e.classList.toggle('act',j===i)});
+  document.querySelectorAll('.plan-day').forEach(function(e,j){e.classList.toggle('act',j===i)});
+}
+
+
+
+function migrate_traces(){try{var d=trc_list();var added=0;Object.keys(S).forEach(function(k){S[k].tp.forEach(function(t){var has=d.some(function(e){return e.k===k&&e.id===t.id});if(!has){d.push({ts:Date.now()-86400000*Math.floor(Math.random()*7+1),k:k,id:t.id,n:t.t,old:'unlearned',new:t.st});added++}})});if(added){trc_save(d)};if(added>0){console.log('km_trace: migrated '+added+' records from existing S data')}}catch(e){console.log('km_trace migration error:',e)}}
+window.onload=function(){initTheme();loadS();rgs();rst();rsc();migrate_traces()};
+
+
+/* ====== 行为跟踪 ====== */
+function trc_list(){try{var d=JSON.parse(localStorage.getItem('km_trace')||'[]');return d}catch(e){return[]}}
+function trc_save(d){try{localStorage.setItem('km_trace',JSON.stringify(d));var bk=JSON.parse(localStorage.getItem('km_trace_bk')||'[]');bk.unshift({ts:Date.now(),snap:d});if(bk.length>5)bk=bk.slice(0,5);localStorage.setItem('km_trace_bk',JSON.stringify(bk))}catch(e){}}
+function trc_add(e){var d=trc_list();d.push(e);if(d.length>500)d=d.slice(-400);trc_save(d);data_backup_auto()}
+function addSubject(key,data){if(S[key]){console.warn('Subject '+key+' exists');return}S[key]=data;rgs();rst();if(cur===key||cur==='_stats'){sw(cur)}}
+
+function trc_stats(days){var all=trc_list();if(days){var cut=Date.now()-days*86400000;all=all.filter(function(e){return e.ts>cut})}
+var bySub={};var total=all.length;all.forEach(function(e){if(!bySub[e.k])bySub[e.k]={total:0,up:0,down:0};bySub[e.k].total++;if(e.new==='mastered')bySub[e.k].up++;if(e.new==='unlearned'&&e.old!=='unlearned')bySub[e.k].down++})
+var today=all.filter(function(e){return e.ts>Date.now()-86400000}).length;var week=all.filter(function(e){return e.ts>Date.now()-604800000}).length
+return{total:total,today:today,week:week,bySub:bySub,all:all.slice(-30).reverse()}}
+
+/* ====== 统计面板 ====== */
+function rst_stats(){var c=document.getElementById('stabs')
+c.innerHTML=Object.keys(S).map(function(k){var s=S[k];var a=k===cur;var uc=s.tp.filter(function(t){return t.st==='unlearned'}).length
+return'<div class="tab'+(a?' act':'')+'" onclick="sw(\x27'+k+'\x27)">'+s.i+s.n+(uc?'<span class=bd>'+uc+'</span>':'')+'</div>'}).join('')+'<div class="tab'+(cur==='_goal'?' act':'')+'" onclick="sw(\x27_goal\x27)">\ud83c\udf1f \u51b2\u523a\u76ee\u6807</div><div class="tab'+(cur==='_stats'?' act':'')+'" onclick="sw(\x27_stats\x27)">\ud83d\udcca \u5b66\u4e60\u7edf\u8ba1</div>'}
+
+function rstats(){var c=document.getElementById('sarea');cur='_stats'
+c.innerHTML='<div class="pg act" id=c-_stats></div>'+'<div id=st-f><button class="tf act" data-d=0>\u4eca\u65e5</button><button class=tf data-d=1>\u6628\u65e5</button><button class=tf data-d=7>\u8fd17\u5929</button><button class=tf data-d=14>\u8fd114\u5929</button><button class=tf data-d=0 data-a=1>\u5168\u90e8</button></div>'
+document.querySelectorAll('.tab').forEach(function(e,i){e.classList.toggle('act',e.textContent.includes('\ud83d\udcca'))})
+var bd=document.getElementById('c-_stats');var tf_days=0;var tf_all=0
+function redraw(){var st=tf_all?trc_stats(0):trc_stats(tf_days||undefined);if(!st.total){try{migrate_traces()}catch(e){};st=tf_all?trc_stats(0):trc_stats(tf_days||undefined)}var g=gs();var tt=g.tt>0?Math.round(g.m/g.tt*100):0;var html='',tips=[]
+html+='<div class=stats style=grid-template-columns:repeat(auto-fit,minmax(110px,1fr))><div class=sc><div class="num bl">'+st.total+'</div><div class=lb>\u64cd\u4f5c\u6b21\u6570</div></div><div class=sc><div class="num gr">'+st.today+'</div><div class=lb>\u4eca\u65e5</div></div><div class=sc><div class="num or">'+st.week+'</div><div class=lb>\u672c\u5468</div></div><div class=sc><div class="num gr">'+g.m+'/'+g.tt+'</div><div class=lb>\u5df2\u638c\u63e1</div></div><div class=sc><div class="num re">'+g.u+'</div><div class=lb>\u5f85\u653b\u514b</div></div><div class=sc><div class="num " style="color:'+(tt>=50?'var(--sg)':'var(--sr)')+'">'+tt+'%</div><div class=lb>\u638c\u63e1\u7387</div></div></div>'
+html+='<div class=sec><div class=st><span class=ac>\ud83d\udcca</span>\u5404\u79d1\u76ee\u7edf\u8ba1</div><div class=cr>'
+Object.keys(S).forEach(function(k){var s=S[k];var ss=st.bySub[k];var cnt=ss?ss.total:0;var un=s.tp.filter(function(t){return t.st==='unlearned'}).length;var ml=s.tp.filter(function(t){return t.st==='mastered'}).length;var sl=s.tp.filter(function(t){return t.st==='studying'}).length;var subRatio=s.tp.length>0?Math.round(ml/s.tp.length*100):0;var subCol=subRatio>70?'var(--sg)':subRatio>40?'var(--so)':'var(--sr)'
+html+='<div class=sc style=min-width:140px><div class="num" style=font-size:1.3em>'+ml+'/'+s.tp.length+'</div><div class=lb>'+s.i+s.n+(un?'<span class=bd style=font-size:.7em;margin-left:4px>'+un+'</span>':'')+'</div><div style=font-size:.78em;display:flex;gap:8px;flex-wrap:wrap><span style=color:var(--sg)>\u2705\u5df2\u638c\u63e1'+ml+'</span>'+(sl?'<span style=color:var(--so)>\ud83d\udcd6\u5b66\u4e60\u4e2d'+sl+'</span>':'')+(un?'<span style=color:var(--sr)>\u274c\u672a\u638c\u63e1'+un+'</span>':'')+(cnt?'<span style=color:var(--text5)>\ud83d\udd04\u64cd\u4f5c\u6b21\u6570'+cnt+'</span>':'')+'</div><div class=goal-bar style=width:100%><div class=bf style=width:'+subRatio+'%;background:linear-gradient(90deg,'+subCol+',var(--border))></div></div></div>'})
+html+='</div></div>'
+html+='<div class=sec><div class=st><span class=ac>\ud83d\udcc8</span>\u8be6\u7ec6\u64cd\u4f5c\u8bb0\u5f55</div>'
+if(st.all.length||1){html+='<div class=tg>'
+if(!st.all.length){html+='<div style=text-align:center;padding:20px 0;color:var(--text5)><div style=font-size:2em;margin-bottom:8px>\ud83d\udcda</div><div>\u6682\u65e0\u64cd\u4f5c\u8bb0\u5f55\uff0c\u4ee5\u4e0b\u4e3a\u5f53\u524d\u638c\u63e1\u72b6\u6001\uff1a</div></div>';Object.keys(S).forEach(function(k){var s=S[k];s.tp.forEach(function(t){var lb2={mastered:'\u5df2\u638c\u63e1',studying:'\u5b66\u4e60\u4e2d',unlearned:'\u672a\u638c\u63e1'}[t.st];var cl2={mastered:'var(--sg)',studying:'var(--so)',unlearned:'var(--sr)'}[t.st];html+='<div class=tc><div class=tl-time style=font-size:.65em>'+s.i+'</div><div class=tl-body><h5>'+t.t+'</h5><div class=tl-state><span style=color:'+cl2+';font-weight:bold>'+lb2+'</span></div></div></div>'})})}
+var lastDate='';st.all.forEach(function(e){try{var k=S[e.k];if(!k)return;var dt=new Date(e.ts);var ds=dt.getFullYear()+'\u5e74'+(dt.getMonth()+1)+'\u6708'+dt.getDate()+'\u65e5';var dsh=ds!==lastDate?'<div style=padding:6px 0 4px;color:var(--text5);font-size:.8em;font-weight:bold;border-bottom:1px solid var(--border);margin:4px 0>'+ds+'</div>':'';lastDate=ds
+var lb={mastered:'\u5df2\u638c\u63e1',studying:'\u5b66\u4e60\u4e2d',unlearned:'\u672a\u638c\u63e1'}[e.new];var cl={mastered:'var(--sg)',studying:'var(--so)',unlearned:'var(--sr)'}[e.new];var ts=dt.getHours().toString().padStart(2,'0')+':'+dt.getMinutes().toString().padStart(2,'0');var oldLb=e.old?{mastered:'\u5df2\u638c\u63e1',studying:'\u5b66\u4e60\u4e2d',unlearned:'\u672a\u638c\u63e1'}[e.old]:''
+html+=dsh+'<div class=tc><div class=tl-time>'+ts+'</div><div class=tl-body><h5>'+(k?S[k].i:'')+' '+e.n+'</h5><div class=tl-state><span style=color:'+cl+';font-weight:bold>'+lb+'</span>'+(oldLb?' <span class=tl-arr>\u2190</span> <span style=color:var(--text5)>'+oldLb+'</span>':'')+'</div></div></div>'
+}catch(ex){}})
+}
+if(g.m>0){var best='';var bestR=0;Object.keys(S).forEach(function(k){var s=S[k];var r=s.tp.length>0?Math.round(s.tp.filter(function(t){return t.st==='mastered'}).length/s.tp.length*100):0;if(r>bestR){bestR=r;best=k}});if(best)tips.push('\ud83c\udfc6 \u638c\u63e1\u6700\u597d\uff1a'+S[best].n+'\uff08'+bestR+'%\uff09')}
+if(!tips.length)tips.push('\ud83c\udf89 \u7ee7\u7eed\u52aa\u529b\uff0c\u575a\u6301\u6bcf\u65e5\u5b66\u4e60\uff01')
+html+=tips.join('</p><p style=color:var(--text5);font-size:.95em;line-height:1.8>')+'</p></div></div>'
+html+='<div class=sec><div class=st><span class=ac>\u2699\ufe0f</span>\u6570\u636e\u7ba1\u7406</div><div style=display:flex;gap:8px;padding:8px 0><button class="btn-g" onclick=exportData()>\ud83d\udce4 \u5bfc\u51fa\u5907\u4efd</button><button class="btn-o" onclick=importData()>\ud83d\udce5 \u5bfc\u5165\u6062\u590d</button><button class="btn-r" onclick=resetAllData()>\ud83d\uddd1\ufe0f \u6e05\u9664\u6570\u636e</button></div></div>'
+bd.innerHTML=html}
+redraw()
+document.querySelectorAll('#st-f .tf').forEach(function(b){b.addEventListener('click',function(){tf_days=parseInt(this.getAttribute('data-d'));tf_all=this.getAttribute('data-a')==='1'?1:0;document.querySelectorAll('#st-f .tf').forEach(function(x){x.classList.remove('act')});this.classList.add('act');redraw()})})};function ai_profile(){var o=JSON.parse(localStorage.getItem('km_profile')||'{}');document.getElementById('pp-name').value=o.name||'';document.getElementById('pp-grade').value=o.grade||0;document.getElementById('pp-target').value=o.target||'';document.getElementById('pp-strong').value=o.strong||'';document.getElementById('pp-weak').value=o.weak||'';document.getElementById('pp-note').value=o.note||'';document.getElementById('ai-pp').classList.add('act')}
+function ai_profile_close(){document.getElementById('ai-pp').classList.remove('act')}
+function ai_profile_save(){var o={};o.name=document.getElementById('pp-name').value.trim();o.grade=parseInt(document.getElementById('pp-grade').value);o.target=document.getElementById('pp-target').value.trim();o.strong=document.getElementById('pp-strong').value.trim();o.weak=document.getElementById('pp-weak').value.trim();o.note=document.getElementById('pp-note').value.trim();localStorage.setItem('km_profile',JSON.stringify(o));ai_profile_close();alert('\u2705 \u5b66\u4e60\u6863\u6848\u5df2\u4fdd\u5b58\uff0c\u6bcf\u6b21\u5bf9\u8bdd\u81ea\u52a8\u52a0\u8f7d')}
+
+function ai_get_profile_str(){var o=JSON.parse(localStorage.getItem('km_profile')||'{}');var parts=[];if(o.name)parts.push('\u59d3\u540d\uff1a'+o.name);if(o.grade){var gn={7:'\u521d\u4e00',8:'\u521d\u4e8c',9:'\u521d\u4e09'}[o.grade]||o.grade;parts.push('\u5e74\u7ea7\uff1a'+gn)}if(o.target)parts.push('\u76ee\u6807\u9ad8\u4e2d\uff1a'+o.target);if(o.strong)parts.push('\u4f18\u52bf\u79d1\u76ee\uff1a'+o.strong);if(o.weak)parts.push('\u8584\u5f31\u79d1\u76ee\uff1a'+o.weak);if(o.note)parts.push('\u5907\u6ce8\uff1a'+o.note);return parts.length?'\n\n===== \u5b66\u751f\u6863\u6848 =====\n'+parts.join('\n')+'\n====================':'(\u5c1a\u672a\u8bbe\u7f6e\u5b66\u4e60\u6863\u6848)'}
+
+/* ====== 数据管理 ====== */
+var dm_auto=true;function dm_auto_state(){try{var v=localStorage.getItem('km_dm_auto');dm_auto=v!=='0'}catch(e){}}
+function data_mgmt_open(){dm_auto_state();document.getElementById('dm-auto-btn').textContent=dm_auto?'⏸ 暂停自动备份':'▶ 恢复自动备份';document.getElementById('ai-dm').classList.add('act');data_backups_show()}
+function data_mgmt_close(){document.getElementById('ai-dm').classList.remove('act')}
+function data_export_keys(){return[SK,'km_trace','km_profile','km_theme','km_fsz','km_cd','km_bd','km_gd','km_exp']}
+function data_export(){try{var o={};o._ver=1;o._time=Date.now();o._label='\u4e2d\u8003\u5b66\u4e60\u6570\u636e\u5907\u4efd';data_export_keys().forEach(function(k){try{var v=localStorage.getItem(k);if(v)o[k]=JSON.parse(v)}catch(ex){}});var blob=new Blob([JSON.stringify(o,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='\u4e2d\u8003\u5b66\u4e60\u5907\u4efd_'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);alert('\u2705 \u6570\u636e\u5df2\u5bfc\u51fa\uff01')}catch(e){alert('\u26a0\ufe0f \u5bfc\u51fa\u5931\u8d25\uff1a'+e.message)}}
+function data_import(input){try{var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var o=JSON.parse(e.target.result);if(!o||!o._ver){alert('\u26a0\ufe0f \u65e0\u6548\u7684\u5907\u4efd\u6587\u4ef6');return}var cnt=0;data_export_keys().forEach(function(k){if(o[k]!==undefined){localStorage.setItem(k,JSON.stringify(o[k]));cnt++}});alert('\u2705 \u6062\u590d\u5b8c\u6210\uff01\u5171\u66f4\u65b0'+cnt+'\u9879\u6570\u636e\u3002\u8bf7\u5237\u65b0\u9875\u9762\u67e5\u770b\u6548\u679c\u3002');data_mgmt_close();setTimeout(function(){location.reload()},1500)}catch(ex){alert('\u26a0\ufe0f \u89e3\u6790\u5931\u8d25\uff1a'+ex.message)}};reader.readAsText(file);input.value=''}catch(e){alert('\u26a0\ufe0f \u5bfc\u5165\u5931\u8d25\uff1a'+e.message)}}
+function data_backup(){try{var bk={_time:Date.now(),_label:new Date().toLocaleString('zh-CN')+'\u7684\u5907\u4efd'};data_export_keys().forEach(function(k){try{var v=localStorage.getItem(k);if(v)bk[k]=JSON.parse(v)}catch(ex){}});var list=[];try{list=JSON.parse(localStorage.getItem('km_backups')||'[]')}catch(e){}list.push(bk);if(list.length>5)list=list.slice(-5);localStorage.setItem('km_backups',JSON.stringify(list));data_backups_show();alert('\u2705 \u5feb\u7167\u5df2\u4fdd\u5b58\uff01\u5171'+bk._time+'\u5b57\u8282')}catch(e){alert('\u26a0\ufe0f \u5907\u4efd\u5931\u8d25\uff1a'+e.message)}}
+function data_backups_show(){try{var list=[];try{list=JSON.parse(localStorage.getItem('km_backups')||'[]')}catch(e){}var c=document.getElementById('dm-backup-list');if(!c)return;if(!list.length){c.innerHTML='<div style=color:var(--text5);padding:4px 0>\u6682\u65e0\u81ea\u52a8\u5907\u4efd</div>';return}c.innerHTML=list.slice().reverse().map(function(b,i){var idx=list.length-1-i;var d=new Date(b._time);var ds=d.getFullYear()+'\u5e74'+(d.getMonth()+1)+'\u6708'+d.getDate()+'\u65e5 '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');return'<div><span>\u23f1'+ds+'</span><button style=background:var(--sac);color:#fff;border:none;border-radius:6px;padding:2px 10px;cursor:pointer;font-size:.8em onclick=\\"data_backup_restore('+idx+')\\">\u2460 \u6062\u590d</button></div>'}).join('')}catch(e){}}
+function data_backup_restore(idx){try{if(!confirm('\u786e\u5b9a\u8981\u6062\u590d\u8fd9\u4efd\u5907\u4efd\u5417\uff1f\u5f53\u524d\u6570\u636e\u5c06\u88ab\u8986\u76d6\u3002'))return;var list=JSON.parse(localStorage.getItem('km_backups')||'[]');var bk=list[idx];if(!bk){alert('\u26a0\ufe0f \u5907\u4efd\u4e0d\u5b58\u5728');return}var cnt=0;data_export_keys().forEach(function(k){if(bk[k]!==undefined){localStorage.setItem(k,JSON.stringify(bk[k]));cnt++}});alert('\u2705 \u6062\u590d\u5b8c\u6210\uff01\u5171\u66f4\u65b0'+cnt+'\u9879\u6570\u636e\u3002\u8bf7\u5237\u65b0\u9875\u9762\u3002');data_mgmt_close();setTimeout(function(){location.reload()},1500)}catch(e){alert('\u26a0\ufe0f \u6062\u590d\u5931\u8d25\uff1a'+e.message)}}
+function data_backup_auto(){if(!dm_auto)return;try{var list=[];try{list=JSON.parse(localStorage.getItem('km_backups')||'[]')}catch(e){};var cutoff=Date.now()-86400000;var recent=list.filter(function(b){return b._time>cutoff});if(recent.length<2)data_backup()}catch(e){}}
+function data_backup_auto_toggle(){dm_auto=!dm_auto;localStorage.setItem('km_dm_auto',dm_auto?'1':'0');document.getElementById('dm-auto-btn').textContent=dm_auto?'\u23f8 \u6682\u505c\u81ea\u52a8\u5907\u4efd':'\u25b6 \u6062\u590d\u81ea\u52a8\u5907\u4efd';alert((dm_auto?'\u2705 \u81ea\u52a8\u5907\u4efd\u5df2\u5f00\u542f':'⏸ \u81ea\u52a8\u5907\u4efd\u5df2\u6682\u505c'))}
+dm_auto_state();
+
+/* ====== 定向生政策 ====== */
+var policy_data={title:"太原市中考定向生政策详解",sections:[{h:"一、政策核心概念",p:"定向生是太原市23所示范高中实施的招生政策，通过将不低于60%的招生计划分配到全市初中（含公立和私立），在统招线下50分范围内择优录取。",ul:["分数规则：非直接加分或降分，而是在报考高中统招线下50分内录取（如统招线595分，定向生需≥545分）","双重录取机制：分为\"一次定向\"（看校内排名）和\"二次定向\"（看全市排名）"]},{h:"二、录取流程实例解析",p:"1. 一次定向（校际竞争）",ul:["以虚拟案例说明：2025年山大附中给太原七十中1个名额，该校前三名考生成绩分别为809/806/800分（均超统招线811-50=761分），仅校排名第一者被录取。"],"p2":"2. 二次定向（全市调剂）",ul2:["未使用完的定向名额及落选考生（需达统招线下50分）进入全市池子重新排名。前述案例中806分考生通过二次定向线805.5分被补录，800分考生淘汰。"]},{h:"三、特殊规则与限制",ul:["志愿填报：必须使用659/669开头学校编码，且实行\"报一次定两次\"机制","区域保护：六城区与三县一市（清徐、古交等）名额不可交叉使用","资格排除：往届生、借读生、随迁子女（四证不全）、综合素质不合格者无资格","分数门槛：2025年理论使用资格需≥680.1分（重点高中线730.1分的90%）"]},{h:"四、政策深层逻辑",p:"教育均衡导向：薄弱初中更易通过一次定向录取，优质初中需竞争二次定向",ul:["数据印证：举例中二次定向线（805.5分）比一次定向实际录取分（809分）更低，体现资源再分配特性"]},{h:"五、实操建议",p:"1. 策略选择",ul:["普通初中：重点争取校内排名","优质初中：需同时关注全市位次"],"p2":"2. 风险提示",ul2:["即使达统招线（如案例中595分）报考定向生也不占名额，但区域保护可能导致部分考生无法使用跨区指标"]}]};
+
+function policy_open(){var d=policy_data,s='<h2>📋 '+d.title+'</h2>';s+='<h3>政策概览图</h3>';s+='<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:20px 0;flex-wrap:wrap"><div style="background:linear-gradient(135deg,#4caf50,#2e7d32);color:#fff;padding:12px 20px;border-radius:10px;text-align:center;min-width:120px"><div style="font-size:.85em;opacity:.9">高分考生</div><div style="font-size:1.3em;font-weight:bold">统招线</div><div style="font-size:.75em;opacity:.8">≥595分</div></div><div style="color:#ff9800;font-size:1.5em">→</div><div style="background:linear-gradient(135deg,#2196f3,#0d47a1);color:#fff;padding:12px 20px;border-radius:10px;text-align:center;min-width:120px"><div style="font-size:.85em;opacity:.9">定向生</div><div style="font-size:1.3em;font-weight:bold">录取区间</div><div style="font-size:.75em;opacity:.8">545-595分</div></div><div style="color:#ff9800;font-size:1.5em">↓</div><div style="display:flex;gap:8px"><div style="background:linear-gradient(135deg,#ff9800,#f57c00);color:#fff;padding:10px 16px;border-radius:10px;text-align:center"><div style="font-size:.8em">一次定向</div><div style="font-size:.7em;opacity:.8">校内排名</div></div><div style="background:linear-gradient(135deg,#9c27b0,#7b1fa2);color:#fff;padding:10px 16px;border-radius:10px;text-align:center"><div style="font-size:.8em">二次定向</div><div style="font-size:.7em;opacity:.8">全市排名</div></div></div></div>';s+='<h3>一、政策核心概念</h3><p>定向生是太原市23所示范高中实施的招生政策，通过将不低于60%的招生计划分配到全市初中（含公立和私立），在统招线下50分范围内择优录取。</p><ul><li><b>分数规则：</b>非直接加分或降分，而是在报考高中统招线下50分内录取（如统招线595分，定向生需≥545分）</li><li><b>双重录取机制：</b>分为"一次定向"（看校内排名）和"二次定向"（看全市排名）</li></ul>';s+='<h3>二、录取流程实例解析</h3>';s+='<div style="display:flex;gap:16px;margin:16px 0;flex-wrap:wrap"><div style="flex:1;min-width:280px;background:var(--bg3);border-radius:12px;padding:16px;border-left:4px solid #4caf50"><div style="color:#4caf50;font-weight:bold;margin-bottom:8px">🎯 一次定向（校际竞争）</div><div style="color:var(--text4);font-size:.95em;line-height:1.7">案例：山大附中给太原七十中1个名额<br>该校前三名：809/806/800分<br><b style="color:#4caf50">结果：809分考生被录取</b></div></div><div style="flex:1;min-width:280px;background:var(--bg3);border-radius:12px;padding:16px;border-left:4px solid #9c27b0"><div style="color:#9c27b0;font-weight:bold;margin-bottom:8px">🎯 二次定向（全市调剂）</div><div style="color:var(--text4);font-size:.95em;line-height:1.7">落选考生进入全市池子重新排名<br>806分考生：805.5分补录<br><b style="color:#9c27b0">结果：806分考生被录取</b></div></div></div>';s+='<h3>三、特殊规则与限制</h3><ul><li><b>志愿填报：</b>必须使用659/669开头学校编码，且实行"报一次定两次"机制</li><li><b>区域保护：</b>六城区与三县一市（清徐、古交等）名额不可交叉使用</li><li><b>资格排除：</b>往届生、借读生、随迁子女（四证不全）、综合素质不合格者无资格</li><li><b>分数门槛：</b>2025年理论使用资格需≥680.1分（重点高中线730.1分的90%）</li></ul>';s+='<h3>四、政策深层逻辑</h3><p>教育均衡导向：薄弱初中更易通过一次定向录取，优质初中需竞争二次定向</p><ul><li>数据印证：举例中二次定向线（805.5分）比一次定向实际录取分（809分）更低，体现资源再分配特性</li></ul>';s+='<h3>五、实操建议</h3><p style="font-weight:bold;color:var(--so)">1. 策略选择</p><ul><li>普通初中：重点争取校内排名</li><li>优质初中：需同时关注全市位次</li></ul><p style="font-weight:bold;color:var(--sr)">2. 风险提示</p><ul><li>即使达统招线（如案例中595分）报考定向生也不占名额，但区域保护可能导致部分考生无法使用跨区指标</li></ul>';s+='<div class="sbs"><button class="btn-g" onclick="policy_close()">我知道了</button></div>';document.getElementById('policy-content').innerHTML=s;document.getElementById('policy-mo').classList.add('act')}
+function policy_close(){document.getElementById('policy-mo').classList.remove('act')}
+
+/* ====== 分数线参考 ====== */
+var scoreData={二模:{title:"2026届 · 太原市初三二模数据分析",base:{性质:"太原市初三第二次模拟考试",查分平台:"七天学堂系统",参考规模:"全市47,500余名考生",满分:"七科总分660分"},ranges:[{range:"601.5分以上",count:"299人",pct:"前0.63%"},{range:"594-601.5分",count:"384人"},{range:"585.5-594分",count:"785人"},{range:"579-585.5分",count:"708人"},{range:"574-579分",count:"713人"},{range:"565-574分",count:"1387人"},{range:"556.5-565分",count:"1464人"},{range:"549-556.5分",count:"1418人"},{range:"532-549分",count:"3328人"},{range:"514-532分",count:"3399人"},{range:"495.5-514分",count:"3238人"}],trend:{头部:"前5%考生（约2375人）需关注574分以上区间",普高:"452分以上23,806人（约50%录取率参考线）",基础:"394分以上30,420人（达标考生占比64%）"},tips:["定位工具：通过\"七天学堂\"查询具体排名","500分档：每提升5分可超越约800人","550分档：每提升3分可超越约500人","数据呈现典型金字塔分布，549分成为重要分水岭"]},一模:{title:"2026届 · 太原市初三一模数据",base:{性质:"太原市初三第一次模拟考试",查分平台:"七天学堂系统",参考规模:"全市约47,000名考生",满分:"七科总分660分"},ranges:[{range:"605分以上",count:"约280人",pct:"前0.6%"},{range:"590-605分",count:"约360人"},{range:"575-590分",count:"约720人"},{range:"560-575分",count:"约1100人"},{range:"545-560分",count:"约1800人"},{range:"530-545分",count:"约2500人"},{range:"510-530分",count:"约3200人"},{range:"490-510分",count:"约3500人"},{range:"460-490分",count:"约4200人"}],trend:{头部:"前5%需关注580分以上",普高:"约445分以上有希望",基础:"约380分以上为基础达标"},tips:["一模是首次全市统测，是定位自身水平的重要参考","建议结合一二模数据综合判断","关注排名比分数更有参考价值"]}};
+
+function toggleDropdown(e){e.stopPropagation();var d=document.getElementById('scoreDropdown');d.classList.toggle('show')}
+document.addEventListener('click',function(){document.getElementById('scoreDropdown').classList.remove('show')});
+
+function scoreData_open(type){var data=scoreData[type];if(!data)return;var s='<h2>📊 '+data.title+'</h2>';s+='<h3>一、基础考试信息</h3><ul>';for(var k in data.base)s+='<li><b>'+k+'：</b>'+data.base[k]+'</li>';s+='</ul>';s+='<h3>二、分数段人数分布图</h3><div id="scoreChart" style="width:100%;height:320px;margin:16px 0"></div>';s+='<h3>三、各分数段人数详情</h3><table class="dl-tbl"><tr><th>分数段</th><th>人数</th><th>占比</th></tr>';var total=0;data.ranges.forEach(function(r){var cnt=parseInt(r.count.replace(/[^0-9]/g,''))||0;total+=cnt});data.ranges.forEach(function(r){var cnt=parseInt(r.count.replace(/[^0-9]/g,''))||0;var pct=total>0?((cnt/total)*100).toFixed(1)+'%':'--';s+='<tr><td>'+r.range+'</td><td>'+r.count+'</td><td>'+pct+'</td></tr>'});s+='</table>';s+='<h3>四、整体分数趋势</h3><ul>';for(var k in data.trend)s+='<li><b>'+k+'：</b>'+data.trend[k]+'</li>';s+='</ul>';s+='<h3>五、家长应用建议</h3><ul>';data.tips.forEach(function(t){s+='<li>'+t+'</li>'});s+='</ul>';s+='<div class="sbs"><button class="btn-g" onclick="scoreData_close()">我知道了</button></div>';document.getElementById('score-content').innerHTML=s;document.getElementById('score-mo').classList.add('act');document.getElementById('scoreDropdown').classList.remove('show');setTimeout(function(){var chartDom=document.getElementById('scoreChart');if(chartDom&&echarts){var myChart=echarts.init(chartDom);var categories=data.ranges.map(function(r){return r.range});var counts=data.ranges.map(function(r){return parseInt(r.count.replace(/[^0-9]/g,''))||0});var option={tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},grid:{left:'3%',right:'4%',bottom:'3%',containLabel:true},xAxis:{type:'value',name:'人数',axisLabel:{color:'#888'}},yAxis:{type:'category',data:categories.reverse(),axisLabel:{color:'#aaa',fontSize:11}},series:[{name:'人数',type:'bar',data:counts.reverse(),itemStyle:{color:{type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:'#4caf50'},{offset:1,color:'#81c784'}]}},label:{show:true,position:'right',color:'#aaa',fontSize:11}}]};myChart.setOption(option);window.addEventListener('resize',function(){myChart.resize()})}},100)}
+function scoreData_close(){document.getElementById('score-mo').classList.remove('act')}
+
+/* ====== AI 面板拖拽 ====== */
+var ai_drag=0,ai_dx=0,ai_dy=0;
+function ai_init_drag(){var ph=document.getElementById('ai-ph');if(!ph)return
+ph.addEventListener('mousedown',function(e){if(e.target.tagName==='BUTTON')return;ai_drag=1;var p=document.getElementById('ai-panel');var r=p.getBoundingClientRect();ai_dx=e.clientX-r.left;ai_dy=e.clientY-r.top;p.style.bottom='auto';p.style.right='auto';p.style.left=r.left+'px';p.style.top=r.top+'px';p.style.transition='none';e.preventDefault()})
+document.addEventListener('mousemove',function(e){if(!ai_drag)return;var p=document.getElementById('ai-panel');p.style.left=(e.clientX-ai_dx)+'px';p.style.top=(e.clientY-ai_dy)+'px'})
+document.addEventListener('mouseup',function(){ai_drag=0})}
+
+/* ====== AI 悬浮按钮 ====== */
+var ai_open=0,ai_min=0;
+function ai_toggle(){ai_open=!ai_open;var p=document.getElementById('ai-panel');if(!p)return;if(ai_open){p.style.display='flex';if(ai_min)p.classList.add('ai-min');ai_init_drag()}else{p.style.display='none'}}
+function ai_minimize(){ai_min=!ai_min;var p=document.getElementById('ai-panel');if(!p)return;p.classList.toggle('ai-min',ai_min)}
+function ai_recent(){var c=document.getElementById('ai-log');if(!c)return;try{var logs=JSON.parse(localStorage.getItem('km_ai_log')||'[]');c.innerHTML=logs.slice(-20).reverse().map(function(m){return'<div class="ai-msg ai-'+m.role+'">'+(m.role==='user'?'\ud83e\uddd1':'\ud83e\udd16')+' '+m.c.replace(/</g,'&lt;')+'</div>'}).join('')}catch(e){}}
+function ai_send(){var inp=document.getElementById('ai-inp');if(!inp)return;var msg=inp.value.trim();if(!msg)return;inp.value='';ai_chat(msg)}
+function ai_chat(msg){var c=document.getElementById('ai-log');if(!c)return;var apiKey=localStorage.getItem('km_dsk_key')||''
+if(!apiKey){c.innerHTML+='<div class="ai-msg ai-err">\u26a0\ufe0f \u8bf7\u5148\u70b9\u51fb\ud83d\udd11\u8bbe\u7f6eDeepseek API Key</div>';c.scrollTop=c.scrollHeight;return}
+var logs=[];try{logs=JSON.parse(localStorage.getItem('km_ai_log')||'[]')}catch(e){}
+logs.push({role:'user',c:msg});localStorage.setItem('km_ai_log',JSON.stringify(logs))
+c.innerHTML+='<div class="ai-msg ai-user">\ud83e\uddd1 '+msg.replace(/</g,'&lt;')+'</div><div class="ai-msg ai-bot" id="ai-wait">\ud83e\udd16 \u601d\u8003\u4e2d...</div>';c.scrollTop=c.scrollHeight
+var ctx=ai_context();fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:'\u4f60\u662f\u4e2d\u8003\u5b66\u4e60\u52a9\u624b\u3002\u4ee5\u4e0b\u662f\u8be5\u5b66\u751f\u7684\u5b66\u4e60\u7edf\u8ba1\u6570\u636e\u548c\u4e2a\u4eba\u6863\u6848\uff0c\u8bf7\u57fa\u4e8e\u6b64\u7ed9\u51fa\u9488\u5bf9\u6027\u5efa\u8bae\u3002\u56de\u7b54\u7b80\u6d01\u3001\u9f13\u52b1\u6027\uff0c\u91cd\u70b9\u6307\u51fa\u8584\u5f31\u79d1\u76ee\u548c\u590d\u4e60\u4f18\u5148\u7ea7\uff0c\u6bcf\u6b21\u56de\u7b54\u4e0d\u8d85\u8fc7200\u5b57\u3002\n\n'+ctx},{role:'user',content:msg}],stream:false})})
+.then(function(r){return r.json()}).then(function(j){var w=document.getElementById('ai-wait');if(w){var reply=j.choices&&j.choices[0]&&j.choices[0].message?j.choices[0].message.content:'\uff08\u65e0\u56de\u590d\uff09';w.outerHTML='<div class="ai-msg ai-bot">\ud83e\udd16 '+reply.replace(/</g,'&lt;')+'</div>';logs.push({role:'assistant',c:reply});localStorage.setItem('km_ai_log',JSON.stringify(logs));c.scrollTop=c.scrollHeight}})
+.catch(function(err){var w=document.getElementById('ai-wait');if(w)w.outerHTML='<div class="ai-msg ai-err">\u26a0\ufe0f \u8bf7\u6c42\u5931\u8d25:'+err.message+'</div>'})}
+function ai_context(){var st=trc_stats(14);var g=gs();var parts=[]
+parts.push('\u3010\u603b\u4f53\u7edf\u8ba1\u3011\u603b\u4e13\u9898'+g.tt+'\uff0c\u5df2\u638c\u63e1'+g.m+'('+Math.round(g.m/g.tt*100)+'%)\uff0c\u5b66\u4e60\u4e2d'+g.s+'\uff0c\u672a\u638c\u63e1'+g.u)
+parts.push('\u3010\u8fd1\u671f\u6d3b\u52a8\u301114\u5929\u5185\u72b6\u6001\u53d8\u66f4'+st.total+'\u6b21\uff0c\u4eca\u65e5'+st.today+'\u6b21\uff0c\u672c\u5468'+st.week+'\u6b21')
+Object.keys(st.bySub).forEach(function(k){var s=S[k];if(!s)return;var ss=st.bySub[k];parts.push('\u3010'+s.n+'\u3011\u5171'+ss.total+'\u6b21\u64cd\u4f5c\uff0c\u65b0\u589e\u638c\u63e1'+ss.up+'\u4e2a')})
+var weak=[];Object.keys(S).forEach(function(k){var u=S[k].tp.filter(function(t){return t.st==='unlearned'}).length;if(u>0)weak.push(S[k].n+'('+u+'\u4e2a)')})
+if(weak.length)parts.push('\u3010\u8584\u5f31\u73af\u8282\u3011'+weak.join('\uff1b'))
+parts.push(ai_get_profile_str())
+return parts.join('\n')}
+function ai_set_key(){var key=prompt('\u8bf7\u8f93\u5165 Deepseek API Key\uff1a');if(key){localStorage.setItem('km_dsk_key',key);alert('\u2705 API Key \u5df2\u4fdd\u5b58')}}
+function ai_clear_log(){localStorage.removeItem('km_ai_log');var c=document.getElementById('ai-log');if(c)c.innerHTML='<div class="ai-msg ai-bot">\ud83e\udd16 \u60a8\u597d\uff0c\u6211\u662f\u4e2d\u8003\u5b66\u4e60\u52a9\u624b\uff01\u544a\u8bc9\u6211\u60a8\u60f3\u4e86\u89e3\u54ea\u65b9\u9762\u7684\u5b66\u4e60\u5efa\u8bae\uff1f</div>'}
+</script>
+
+<!-- ====== 生物深度学习页面 ====== -->
+<div class="dl dl-bio" id="bldl"><div class="dl-h"><div><h2>🧬 生物结业冲刺中心</h2><div class=sub>初二生物 · 结业考试冲刺 · 高频考点/易错点/复习计划</div></div><button class="dl-cl" onclick="bldc()">&times;</button></div><div class="dl-nav" id="blnav"></div><div class="dl-bd" id="blbd"></div></div>
+<!-- ====== 地理深度学习页面 ====== -->
+<div class="dl dl-geo" id="gldl"><div class="dl-h"><div><h2>🌍 地理结业冲刺中心</h2><div class=sub>初二地理 · 结业考试冲刺 · 高频考点/易错点/复习计划</div></div><button class="dl-cl" onclick="gldc()">&times;</button></div><div class="dl-nav" id="glnav"></div><div class="dl-bd" id="glbd"></div></div>
+<!-- ====== 生物实验深度学习页面 ====== -->
+<div class="dl dl-exp" id="expdl"><div class="dl-h"><div><h2>🔬 生物实验冲刺中心</h2><div class=sub>初二生物实验 · 现场操作考试 · 六大实验详解/评分标准</div></div><button class="dl-cl" onclick="expdc()">&times;</button></div><div class="dl-nav" id="expnav"></div><div class="dl-bd" id="expbd"></div></div>
+<!-- ====== 语文深度学习页面 ====== -->
+<div class="dl" id="dl">
+  <div class="dl-h">
+    <div>
+      <h2>📚 语文深度学习中心</h2>
+      <div class="sub">初二语文全册 · 基于深度学习文档 · 个性化学习计划</div>
+    </div>
+    <button class="dl-cl" onclick="cld()">&times;</button>
+  </div>
+  <div class="dl-nav" id="dlnav"></div>
+  <div class="dl-bd" id="dlbd"></div>
+</div>
+
+<!-- ====== 数学深度学习页面 ====== -->
+<div class="dl dl-math" id="maldl"><div class="dl-h"><div><h2>🔢 数学深度学习中心</h2><div class=sub>初二数学 · 必考知识点/高频易错点/答题技巧/冲刺计划</div></div><button class="dl-cl" onclick="maldc()">&times;</button></div><div class="dl-nav" id="manav"></div><div class="dl-bd" id="mabd"></div></div>
+
+<!-- ====== 物理深度学习页面 ====== -->
+<div class="dl dl-phy" id="phdl"><div class="dl-h"><div><h2>⚡ 物理深度学习中心</h2><div class=sub>初二物理 · 力学/光学/热学/电学 · 系统化深度学习</div></div><button class="dl-cl" onclick="phdlc()">&times;</button></div><div class="dl-nav" id="phnav"></div><div class="dl-bd" id="phbd"></div></div>
+
+<!-- ====== 英语深度学习页面 ====== -->
+<div class="dl dl-eng" id="endl"><div class="dl-h"><div><h2>🔤 英语深度学习中心</h2><div class=sub>初二英语 · 词汇/语法/阅读/写作 · 系统化深度学习</div></div><button class="dl-cl" onclick="endlc()">&times;</button></div><div class="dl-nav" id="ennav"></div><div class="dl-bd" id="enbd"></div></div>
+
+<!-- ====== 历史深度学习页面 ====== -->
+<div class="dl dl-his" id="hidl"><div class="dl-h"><div><h2>📜 历史深度学习中心</h2><div class=sub>初二历史 · 中国近代史/现代史 · 系统化深度学习</div></div><button class="dl-cl" onclick="hidlc()">&times;</button></div><div class="dl-nav" id="hinav"></div><div class="dl-bd" id="hibd"></div></div>
+
+<!-- ====== 道德与法治深度学习页面 ====== -->
+<div class="dl dl-pol" id="poldl"><div class="dl-h"><div><h2>⚖️ 道德与法治深度学习中心</h2><div class=sub>初二道法 · 法律常识/国情国策/时政热点 · 系统化深度学习</div></div><button class="dl-cl" onclick="poldlc()">&times;</button></div><div class="dl-nav" id="ponav"></div><div class="dl-bd" id="pobd"></div></div>
+
+<script src="dl_subjects.js"></script>
+</body></html>
